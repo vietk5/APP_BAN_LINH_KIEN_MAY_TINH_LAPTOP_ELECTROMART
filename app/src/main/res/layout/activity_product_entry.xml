@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ProductEntryActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:elevation="4dp"
+            android:padding="24dp"
+            android:clipToPadding="false"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+
+            <!-- HEADER -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nhập kho hàng"
+                    android:textColor="#212121"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_dashboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dashboard"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#00796B"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    app:cornerRadius="12dp"/>
+            </RelativeLayout>
+
+            <!-- Form Chính -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="3"
+                android:useDefaultMargins="true"
+                android:layout_marginBottom="24dp">
+
+                <!-- Tên Sản phẩm -->
+                <TextView
+                    android:layout_columnSpan="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tên sản phẩm"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="4dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_columnSpan="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_product_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:backgroundTint="@null"
+                        android:textColor="#212121"
+                        android:hint="Nhập tên sản phẩm"
+                        android:inputType="textCapSentences" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Thương hiệu -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Thương hiệu"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- Loại sản phẩm -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Loại sản phẩm"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- Spinner Thương hiệu -->
+                <Spinner
+                    android:id="@+id/spinner_brand"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="50dp"
+                    android:backgroundTint="#E0E0E0"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:spinnerMode="dropdown"
+                    android:prompt="@string/select_brand"
+                    android:layout_marginEnd="12dp" />
+
+                <!-- Spinner Loại sản phẩm -->
+                <Spinner
+                    android:id="@+id/spinner_category"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="50dp"
+                    android:backgroundTint="#E0E0E0"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:spinnerMode="dropdown"
+                    android:prompt="@string/select_category" />
+            </GridLayout>
+
+            <!-- Thông tin số -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:useDefaultMargins="true"
+                android:layout_marginBottom="24dp">
+
+                <!-- Giá -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Giá (VNĐ)"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <!-- Số lượng -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Số lượng"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <!-- Input giá -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_price"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:textColor="#212121"
+                        android:hint="VD: 12.500.000"
+                        android:inputType="numberDecimal"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Input số lượng -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_marginEnd="12dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_quantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:textColor="#212121"
+                        android:inputType="number"
+                        android:text="1"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </GridLayout>
+
+            <!-- Phần chọn hình ảnh (tách riêng) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hình ảnh"
+                    android:textColor="#212121"
+                    android:textSize="15sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_choose_file"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Choose File"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#00796B"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tùy chọn (JPG/PNG)."
+                    android:textColor="#757575"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Mô tả ngắn -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mô tả ngắn"
+                android:textColor="#212121"
+                android:textSize="15sp"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_short_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:textColor="#212121"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:hint="Nhập mô tả sản phẩm ngắn gọn" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Nút Gửi / Xóa -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="32dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gửi"
+                    android:backgroundTint="#00BFA5"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    app:cornerRadius="16dp"
+                    android:layout_marginEnd="20dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xóa"
+                    android:backgroundTint="#757575"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    app:cornerRadius="16dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
