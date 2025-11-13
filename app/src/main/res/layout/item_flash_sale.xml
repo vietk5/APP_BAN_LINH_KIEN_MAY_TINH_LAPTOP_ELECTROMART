@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/product_item_bg"
+    android:layout_margin="6dp"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/imgFlashProduct"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sample_pc"/>
+
+    <TextView
+        android:id="@+id/txtFlashName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Asus PC Gaming"
+        android:textColor="#000"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:paddingTop="4dp"/>
+
+    <TextView
+        android:id="@+id/txtFlashPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="19.000.000 đ"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:background="#DC2626"
+        android:gravity="center"
+        android:padding="4dp"
+        android:layout_marginTop="4dp"/>
+</LinearLayout>

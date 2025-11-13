@@ -1,0 +1,12 @@
+<resources>
+    <!-- Base app colors -->
+    <color name="primary_blue">#3B82F6</color>
+    <color name="text_black">#000000</color>
+    <color name="text_gray">#888888</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="border_light">#E5E7EB</color>
+
+    <!-- Gradient for background -->
+    <color name="gradient_start">#E0F2FE</color>
+    <color name="gradient_end">#FDF2F8</color>
+</resources>
