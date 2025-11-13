@@ -1,7 +1,6 @@
 🛒 ElectroMart — Ứng dụng bán linh kiện máy tính & laptop
 
 Môn: Lập trình Di động — Nhóm 6
-Bài tập 01: UI cho Login / Register / Forget Password
 
 🔁 Luồng tổng quát
 <span style="background:#eef; padding:2px 8px; border-radius:6px;"> Android (Retrofit) → <b>Controller</b> → <b>Service</b> → <b>Repository</b> → <b>MySQL</b> → <b>Mapper</b> → <b>DTO</b> → Android </span>
