@@ -62,11 +62,35 @@
             android:backgroundTint="#3B82F6"
             android:padding="12dp"/>
     </LinearLayout>
+    <!-- CheckBox chọn tất cả -->
+    <LinearLayout
+        android:id="@+id/layout_select_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:gravity="center_vertical">
 
+        <CheckBox
+            android:id="@+id/checkbox_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn tất cả"
+            android:textSize="16sp"
+            android:textColor="#111827" />
+
+        <TextView
+            android:id="@+id/tv_selected_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="(0 sản phẩm được chọn)"
+            android:textColor="#6B7280"
+            android:textSize="14sp"/>
+    </LinearLayout>
     <!-- 3. DANH SÁCH SẢN PHẨM (Cuộn, nằm giữa Header và Summary) -->
-
-    <!-- 4. FOOTER CỐ ĐỊNH (layout/bottom_navigation) -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_cart"
         android:layout_width="match_parent"
@@ -79,7 +103,7 @@
         android:padding="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_cart" />
-
+    <!-- 4. FOOTER CỐ ĐỊNH (layout/bottom_navigation) -->
     <include
         android:id="@+id/footer"
         layout="@layout/bottom_navigation"
