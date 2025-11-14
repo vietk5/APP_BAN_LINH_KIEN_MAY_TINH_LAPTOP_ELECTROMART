@@ -29,6 +29,9 @@
             android:name=".activity.CategoryActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.EmptyCartActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.FirstPage"
             android:exported="false" />
         <activity
