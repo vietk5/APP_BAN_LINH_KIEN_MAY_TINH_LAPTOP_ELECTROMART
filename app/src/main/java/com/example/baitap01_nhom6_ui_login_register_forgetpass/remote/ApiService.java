@@ -3,6 +3,7 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.remote;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserRegisterRequest;
 
@@ -23,5 +24,5 @@ public interface ApiService {
     Call<ApiResponse> register(@Body UserRegisterRequest request);
 
     @POST("api/auth/login")
-    Call<ApiResponse> login(@Body UserLoginRequest request);
+    Call<ApiResponse<UserDto>> login(@Body UserLoginRequest request);
 }

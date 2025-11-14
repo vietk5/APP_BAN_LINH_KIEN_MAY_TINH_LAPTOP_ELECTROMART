@@ -3,13 +3,17 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.*;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import com.google.gson.Gson;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,23 +48,31 @@ public class LoginActivity extends AppCompatActivity {
 
             UserLoginRequest req = new UserLoginRequest(email, password);
             ApiService api = ApiClient.get();
-            api.login(req).enqueue(new Callback<ApiResponse>() {
+            api.login(req).enqueue(new Callback<ApiResponse<UserDto>>() {
                 @Override
-                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        ApiResponse res = response.body();
-                        Toast.makeText(LoginActivity.this, res.message, Toast.LENGTH_SHORT).show();
+
+                        ApiResponse<UserDto> res = response.body();
+
                         if (res.success) {
-                            // chuyển sang trang chính sau khi login
+                            UserDto user = res.data;
+
+                            SharedPrefManager sp = new SharedPrefManager(LoginActivity.this);
+                            sp.saveUser(user.id, user.email, user.hoTen);
+
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();
                         }
+
+                        Toast.makeText(LoginActivity.this, res.message, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(LoginActivity.this, "Lỗi server", Toast.LENGTH_SHORT).show();
                     }
                 }
+
                 @Override
-                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
                     Toast.makeText(LoginActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
                 }
             });
