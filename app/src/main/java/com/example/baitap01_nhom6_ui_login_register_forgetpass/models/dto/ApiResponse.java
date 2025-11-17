@@ -1,7 +1,19 @@
-    package com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto;
+package com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto;
+public class ApiResponse {
+    private boolean success;
+    private String message;
 
-    public class ApiResponse<T> {
-        public boolean success;
-        public String message;
-        public T data;
+    public ApiResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
     }
+
+    // Thêm getter
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}

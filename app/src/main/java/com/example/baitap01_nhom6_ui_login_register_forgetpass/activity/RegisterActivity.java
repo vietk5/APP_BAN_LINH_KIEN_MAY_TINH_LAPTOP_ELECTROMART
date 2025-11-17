@@ -65,9 +65,9 @@ public class RegisterActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
 
                     ApiResponse apiRes = response.body();
-                    Toast.makeText(RegisterActivity.this, apiRes.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, apiRes.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    if (apiRes.success) {
+                    if (apiRes.isSuccess())  {
                         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                         finish();
                     }

@@ -16,20 +16,22 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".activity.ResetPasswordActivity"
             android:exported="false" />
-        <!-- Trang đăng nhập -->
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.OtpVerifyActivity"
             android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".activity.CartActivity"-->
-<!--            android:exported="false" />-->
+        <activity
+            android:name=".activity.HomeActivity"
+            android:exported="false" /> <!-- Trang đăng nhập -->
+        <!-- <activity -->
+        <!-- android:name=".activity.LoginActivity" -->
+        <!-- android:exported="false" /> -->
+        <activity
+            android:name=".activity.CartActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.CategoryActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.EmptyCartActivity"
             android:exported="false" />
         <activity
             android:name=".activity.FirstPage"
@@ -44,7 +46,7 @@
             android:name=".activity.RegisterActivity"
             android:exported="false" /> <!-- Trang mở đầu (FirstPage) -->
         <activity
-            android:name=".activity.CartActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
