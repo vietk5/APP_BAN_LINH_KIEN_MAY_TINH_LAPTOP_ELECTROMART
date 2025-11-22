@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_refresh"
+        android:title="Làm mới"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="Cài đặt"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="Đăng xuất"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_revenue"
+        android:title="Doanh thu"
+        android:showAsAction="never" />
+</menu>

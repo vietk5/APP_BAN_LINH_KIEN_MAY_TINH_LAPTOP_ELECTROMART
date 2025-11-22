@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- nền hơi sáng hơn background -->
+    <solid android:color="@color/adminCard" />
+
+    <corners android:radius="18dp" />
+
+    <!-- viền trắng, dày hơn để nổi bật -->
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/white" />
+
+    <!-- cho text cách viền một chút -->
+    <padding
+        android:left="12dp"
+        android:top="6dp"
+        android:right="12dp"
+        android:bottom="6dp" />
+</shape>
