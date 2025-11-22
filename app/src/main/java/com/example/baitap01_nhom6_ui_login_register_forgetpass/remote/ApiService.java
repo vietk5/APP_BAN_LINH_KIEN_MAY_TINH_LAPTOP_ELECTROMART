@@ -37,10 +37,10 @@ public interface ApiService {
     Call<List<CategoryDto>> getCategories();
 
     @POST("api/auth/register")
-    Call<ApiResponse> register(@Body UserRegisterRequest request);
+    Call<ApiResponse<Void>> register(@Body UserRegisterRequest request);
 
     @POST("api/auth/login")
-    Call<ApiResponse> login(@Body UserLoginRequest request);
+    Call<ApiResponse<UserDto>> login(@Body UserLoginRequest request);
     @GET("/api/admin/dashboard/summary")
     Call<AdminDashboardSummary> getAdminSummary();
 
@@ -94,13 +94,13 @@ public interface ApiService {
 
     // Quên mật khẩu
     @POST("api/auth/forgot-password")
-    Call<ApiResponse> forgotPassword(@Body ForgotPasswordRequest request);
+    Call<ApiResponse<Void>> forgotPassword(@Body ForgotPasswordRequest request);
 
     @POST("api/auth/verify-otp")
-    Call<ApiResponse> verifyOtp(@Body ForgotPasswordRequest request);
+    Call<ApiResponse<Void>> verifyOtp(@Body ForgotPasswordRequest request);
 
     @POST("api/auth/reset-password")
-    Call<ApiResponse> resetPassword(@Body ResetPasswordRequest request);
+    Call<ApiResponse<Void>> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("/api/admin/products")
     Call<AdminProductDto> createProduct(@Body AdminProductDto product);

@@ -1,8 +1,10 @@
 // activity/HomeActivity.java
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
+import  android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,6 +76,12 @@ public class HomeActivity extends AppCompatActivity {
         recyclerHeadphones.setAdapter(soundAdp);
 
         loadProducts(); // <-- gọi API
+        // chuyen sang trang ca nhan cua nguoi dung
+        LinearLayout btnUser = findViewById(R.id.btnUser);
+        btnUser.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadProducts() {

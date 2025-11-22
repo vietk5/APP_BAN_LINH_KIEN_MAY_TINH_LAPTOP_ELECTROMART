@@ -55,11 +55,11 @@ public class OtpVerifyActivity extends AppCompatActivity {
         // Tạo DTO để gửi
         ForgotPasswordRequest request = new ForgotPasswordRequest(email, otp);
 
-        api.verifyOtp(request).enqueue(new Callback<ApiResponse>() {
+        api.verifyOtp(request).enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse res = response.body();
+                    ApiResponse<Void> res = response.body();
                     Toast.makeText(OtpVerifyActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
 
                     if (res.isSuccess()) {
@@ -75,7 +75,7 @@ public class OtpVerifyActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Toast.makeText(OtpVerifyActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
             }
         });

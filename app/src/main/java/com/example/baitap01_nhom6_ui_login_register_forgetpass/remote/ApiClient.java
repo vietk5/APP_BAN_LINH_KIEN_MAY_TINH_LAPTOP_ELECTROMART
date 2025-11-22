@@ -1,5 +1,7 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.remote;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -14,6 +16,9 @@ public class ApiClient {
             log.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient http = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(log)
                     .build();
 

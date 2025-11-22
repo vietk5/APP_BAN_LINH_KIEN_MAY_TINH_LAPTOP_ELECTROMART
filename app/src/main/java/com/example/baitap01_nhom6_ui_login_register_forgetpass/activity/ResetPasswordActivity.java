@@ -60,13 +60,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
         // 👉 Tạo DTO đúng kiểu mà API backend yêu cầu
         ResetPasswordRequest request = new ResetPasswordRequest(email, newPass);
 
-        api.resetPassword(request).enqueue(new Callback<ApiResponse>() {
+        api.resetPassword(request).enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
 
                 if (response.isSuccessful() && response.body() != null) {
 
-                    ApiResponse res = response.body();
+                    ApiResponse<Void> res = response.body();
                     Toast.makeText(ResetPasswordActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
 
                     if (res.isSuccess()) {
@@ -80,7 +80,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Toast.makeText(ResetPasswordActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
             }
         });

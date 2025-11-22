@@ -1,7 +1,8 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto;
-public class ApiResponse {
+public class ApiResponse<T> {
     private boolean success;
     private String message;
+    private T data;
 
     public ApiResponse(boolean success, String message) {
         this.success = success;
@@ -16,4 +17,5 @@ public class ApiResponse {
     public String getMessage() {
         return message;
     }
+    public T getData() { return data; }
 }

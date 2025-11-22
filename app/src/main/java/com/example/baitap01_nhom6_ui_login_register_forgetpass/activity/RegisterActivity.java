@@ -59,12 +59,12 @@ public class RegisterActivity extends AppCompatActivity {
         UserRegisterRequest request = new UserRegisterRequest(name, email, password);
 
         ApiService apiService = ApiClient.get();
-        apiService.register(request).enqueue(new Callback<ApiResponse>() {
+        apiService.register(request).enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                 if (response.isSuccessful() && response.body() != null) {
 
-                    ApiResponse apiRes = response.body();
+                    ApiResponse<Void> apiRes = response.body();
                     Toast.makeText(RegisterActivity.this, apiRes.getMessage(), Toast.LENGTH_SHORT).show();
 
                     if (apiRes.isSuccess())  {
@@ -77,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Toast.makeText(RegisterActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
             }
         });

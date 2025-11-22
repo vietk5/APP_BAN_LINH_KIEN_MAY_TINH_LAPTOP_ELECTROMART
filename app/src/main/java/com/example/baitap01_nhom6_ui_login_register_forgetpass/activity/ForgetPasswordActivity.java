@@ -69,11 +69,11 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         // Tạo DTO ForgotPasswordRequest để gửi
         ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
-        api.forgotPassword(request).enqueue(new Callback<ApiResponse>() {
+        api.forgotPassword(request).enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse res = response.body();
+                    ApiResponse<Void> res = response.body();
 
                     // Hiển thị thông báo
                     Toast.makeText(ForgetPasswordActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
@@ -92,7 +92,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Toast.makeText(ForgetPasswordActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
             }
         });

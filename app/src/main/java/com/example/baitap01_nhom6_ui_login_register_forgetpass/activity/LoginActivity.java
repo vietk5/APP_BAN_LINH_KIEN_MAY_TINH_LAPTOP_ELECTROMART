@@ -9,9 +9,11 @@ import android.widget.*;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,13 +66,20 @@ public class LoginActivity extends AppCompatActivity {
 
             UserLoginRequest req = new UserLoginRequest(email, password);
             ApiService api = ApiClient.get();
-            api.login(req).enqueue(new Callback<ApiResponse>() {
+            api.login(req).enqueue(new Callback<ApiResponse<UserDto>>() {
                 @Override
-                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        ApiResponse res = response.body();
+                        ApiResponse<UserDto> res = response.body();
                         Toast.makeText(LoginActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
                         if (res.isSuccess()) {
+                            int userId = res.getData().getId();
+                            String userEmail = res.getData().getEmail();
+                            String userName = res.getData().getHoTen();
+
+                            // LƯU VÀO SharedPreferences
+                            SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
+                            sharedPref.saveUser(userId, userEmail, userName);
                             // chuyển sang trang chính sau khi login thành công
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();
@@ -80,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
                 @Override
-                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
                     Toast.makeText(LoginActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();
                 }
             });
