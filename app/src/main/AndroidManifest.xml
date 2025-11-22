@@ -22,23 +22,41 @@
             android:name=".activity.OtpVerifyActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.HomeActivity"
-            android:exported="false" /> <!-- Trang đăng nhập -->
-        <!-- <activity -->
-        <!-- android:name=".activity.LoginActivity" -->
-        <!-- android:exported="false" /> -->
-        <activity
-            android:name=".activity.CartActivity"
+            android:name=".activity.AdminProductActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.CategoryActivity"
+            android:name=".activity.AdminRevenueActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminCustomersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminOrdersActivity"
             android:exported="false" />
         <activity
             android:name=".activity.FirstPage"
             android:exported="false" />
         <activity
+            android:name=".activity.CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.CategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.EmptyCartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ProfileActivity"
             android:exported="false" /> <!-- Trang quên mật khẩu -->
+        <activity
+            android:name=".activity.ProductEntryActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.ForgetPasswordActivity"
             android:exported="false" /> <!-- Trang đăng ký -->
@@ -46,7 +64,7 @@
             android:name=".activity.RegisterActivity"
             android:exported="false" /> <!-- Trang mở đầu (FirstPage) -->
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
