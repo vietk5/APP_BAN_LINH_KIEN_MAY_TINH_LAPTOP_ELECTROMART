@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_admin"
+        android:icon="@drawable/ic_category"
+        app:iconTint="@color/border_light"
+        android:title="Trang chủ"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_products"
+        android:icon="@drawable/ic_laptop"
+        app:iconTint="@color/border_light"
+        android:title="Quản lí sản phẩm"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_customers"
+        android:icon="@drawable/ic_user"
+        app:iconTint="@color/border_light"
+        android:title="Quản lí khách hàng"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_orders"
+        android:icon="@drawable/ic_cart1"
+        app:iconTint="@color/border_light"
+        android:title="Quản lí đơn hàng"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_revenue"
+        android:icon="@drawable/ic_revenue"
+        app:iconTint="@color/border_light"
+        android:title="Quản lí doanh thu"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        app:iconTint="@color/border_light"
+        android:title="Đăng xuất"
+        app:showAsAction="never" />
+</menu>
