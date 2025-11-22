@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="70dp"
     android:orientation="horizontal"
     android:background="#FFFFFF"
     android:elevation="6dp"
-    android:weightSum="4">
+    android:weightSum="5"
+    android:gravity="center_vertical">
 
+    <!-- Home Button -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -23,10 +25,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Trang chủ"
-            android:textSize="12sp"
-            android:textColor="#3B82F6"/>
+            android:textSize="10sp"
+            android:textColor="#3B82F6"
+            android:gravity="center"/>
     </LinearLayout>
 
+    <!-- Category Button -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -42,10 +46,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Danh mục"
-            android:textSize="12sp"
-            android:textColor="#A1A1A1"/>
+            android:textSize="10sp"
+            android:textColor="#A1A1A1"
+            android:gravity="center"/>
     </LinearLayout>
 
+    <!-- Consult Button (Tư vấn) - In the center -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_handshake"
+            app:tint="#0A1EDC"/> <!-- Change this color to highlight -->
+        <!-- You can add a badge or notification count here -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tư vấn"
+            android:textSize="10sp"
+            android:textColor="#476FFF"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <!-- Cart Button -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -61,10 +89,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Giỏ hàng"
-            android:textSize="12sp"
-            android:textColor="#A1A1A1"/>
+            android:textSize="10sp"
+            android:textColor="#A1A1A1"
+            android:gravity="center"/>
     </LinearLayout>
 
+    <!-- Profile Button -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -80,7 +110,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cá nhân"
-            android:textSize="12sp"
-            android:textColor="#A1A1A1"/>
+            android:textSize="10sp"
+            android:textColor="#A1A1A1"
+            android:gravity="center"/>
     </LinearLayout>
+
 </LinearLayout>

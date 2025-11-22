@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adminBackground"
+    android:fitsSystemWindows="true">
+
+    <!-- HEADER CHUNG -->
+    <include
+        android:id="@+id/adminHeader"
+        layout="@layout/layout_admin_header" />
+
+    <!-- NỘI DUNG -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="72dp"
+        android:paddingBottom="8dp">
+
+        <!-- Thanh search + sort -->
+        <TextView
+            android:id="@+id/tvCustomerTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="end"
+            android:text="Tổng: 0 khách hàng"
+            android:textColor="@color/adminTextSecondary"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- ĐÃ CHỈNH SỬA: Thêm boxStrokeColor và màu hint trắng -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutSearch"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:boxStrokeColor="@color/border_light"
+                app:boxStrokeWidth="2dp"
+                android:textColorHint="@android:color/white"
+                app:hintTextColor="@android:color/white">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSearchCustomer"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Tìm theo tên / email"
+                    android:textColor="@android:color/white"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSort"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:text="Mới nhất"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_sort"
+                app:iconTint="@color/adminTextPrimary" />
+        </LinearLayout>
+
+        <!-- Danh sách khách hàng -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerCustomersAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -42,22 +41,17 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/logo"
+                    android:src="@drawable/ic_search"
+                    app:tint="#0F50D3"
                     android:contentDescription="@string/app_name" />
 
                 <EditText
                     android:layout_width="0dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_height="40dp"
                     android:background="@drawable/edit_text_bg"
                     android:hint="Nhập link hoặc tên sản phẩm"
                     android:paddingHorizontal="10dp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/ic_search" />
 
                 <ImageView
                     android:layout_width="30dp"
@@ -66,6 +60,18 @@
                     android:src="@drawable/ic_cart"
                     app:tint="#3B82F6" />
             </LinearLayout>
+
+            <!-- 📍 Chào mừng người dùng -->
+            <TextView
+                android:id="@+id/tvWelcomeMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chào mừng bạn đến với ElectroMart"
+                android:textSize="16sp"
+                android:textColor="#111827"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:textAlignment="center" />
 
             <!-- 🔹 Tabs danh mục -->
             <HorizontalScrollView
@@ -77,31 +83,86 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
+                    <!-- Button PC Gaming -->
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PC Gaming"
-                        android:background="@drawable/tab_button_bg"
-                        android:textColor="@android:color/black"
-                        android:layout_marginEnd="8dp"/>
+                        android:text="PC"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
 
+                    <!-- Button Laptop -->
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Laptop"
-                        android:background="@drawable/tab_button_bg"
-                        android:textColor="@android:color/black"
-                        android:layout_marginEnd="8dp"/>
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
 
+                    <!-- Button Tai nghe  -->
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tai nghe - Loa"
-                        android:background="@drawable/tab_button_bg"
-                        android:textColor="@android:color/black"
-                        android:layout_marginEnd="8dp"/>
+                        android:text="Tai nghe"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- Button Màn hình -->
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Màn hình"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- Button Bàn phím -->
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bàn phím"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- Button Chuột -->
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chuột"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/tab_button_bg1"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -154,21 +215,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="8dp"
-                    android:clipToPadding="false" />
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false" />
             </LinearLayout>
 
-            <!-- 🛍️ Tiêu đề khu sản phẩm -->
+            <!-- 🛍️ Sản phẩm bán chạy nhất -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sản phẩm nổi bật"
+                android:text="Sản phẩm bán chạy"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
                 android:textColor="@android:color/black"/>
 
-            <!-- 📦 Danh sách sản phẩm -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerProducts"
                 android:layout_width="match_parent"
@@ -185,7 +246,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:textColor="@android:color/black"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -196,7 +257,7 @@
                 android:padding="8dp"
                 android:clipToPadding="false"/>
 
-            <!-- 💻 Laptop nổi bật -->
+            <!-- 💻 Laptop -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -204,7 +265,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:textColor="@android:color/black"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -215,19 +276,57 @@
                 android:padding="8dp"
                 android:clipToPadding="false"/>
 
-            <!-- 🎧 Tai nghe - Loa -->
+            <!-- 🖥️ PC -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tai nghe - Loa"
+                android:text="PC / Máy tính để bàn"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/black"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPCs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:padding="8dp"
+                android:clipToPadding="false"/>
+
+            <!-- 🎧 Tai nghe -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tai nghe"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="8dp"
                 android:textColor="@android:color/black"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerHeadphones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:padding="8dp"
+                android:clipToPadding="false"/>
+
+            <!-- 🔊 Loa -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loa"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/black"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSpeakers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"

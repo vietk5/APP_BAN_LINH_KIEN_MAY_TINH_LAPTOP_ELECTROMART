@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/adminBackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- HEADER CHUNG -->
+    <include
+        layout="@layout/layout_admin_header" />
+
+    <!-- Bộ lọc -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <Spinner
+            android:id="@+id/spStatus"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_spinner"
+            android:textColor="@color/border_light"/>
+
+        <Space android:layout_width="12dp" android:layout_height="match_parent"/>
+
+        <Spinner
+            android:id="@+id/spSort"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_spinner"
+            android:textColor="@color/border_light" />
+    </LinearLayout>
+
+    <!-- Danh sách đơn -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerAdminOrders"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp" />
+
+</LinearLayout>
