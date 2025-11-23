@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
 
 public class FirstPage extends AppCompatActivity {
 
@@ -24,11 +25,24 @@ public class FirstPage extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+//        Admin login → chuyển thẳng AdminActivity.
+//        User bình thường → chuyển HomeActivity.
+//        Lần sau mở app → tự động điều hướng đúng màn hình dựa vào SharedPreferences.
+        SharedPrefManager sharedPref = new SharedPrefManager(this);
         new Handler().postDelayed(() -> {
-            Intent intent = new Intent(FirstPage.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+            if (sharedPref.isLoggedIn()) {
+                // Nếu là admin thì vào thẳng trang admin, còn không thì vào trang home cho người dùng
+                if (sharedPref.isAdmin()) {
+                    startActivity(new Intent(this, AdminActivity.class));
+                } else {
+                    startActivity(new Intent(this, HomeActivity.class));
+                }
+                finish();
+                // Nếu khi thoát app người dùng đã đăng xuất thì vào thẳng trang login để đăng nhập lại
+            } else {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
         }, 3000);
     }
 }
