@@ -52,6 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
+            // Hardcode admin
+            final String ADMIN_EMAIL = "admin@electromart.com";
+            final String ADMIN_PASS = "admin123";
 
             // Validate email
             if (email.isEmpty() || password.isEmpty()) {
@@ -63,7 +66,19 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
+            // Đăng nhập admin
+            if (ADMIN_EMAIL.equalsIgnoreCase(email) && ADMIN_PASS.equals(password)) {
+                // Lưu admin
+                SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
+                sharedPref.saveUser(0, email, "Admin", true);
 
+                // Chuyển thẳng sang AdminActivity
+                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                finish();
+                return; // kết thúc hàm
+            }
+
+            // Các user bình thường đi qua API
             UserLoginRequest req = new UserLoginRequest(email, password);
             ApiService api = ApiClient.get();
             api.login(req).enqueue(new Callback<ApiResponse<UserDto>>() {
@@ -76,12 +91,19 @@ public class LoginActivity extends AppCompatActivity {
                             int userId = res.getData().getId();
                             String userEmail = res.getData().getEmail();
                             String userName = res.getData().getHoTen();
+                            boolean isAdmin = ADMIN_EMAIL.equalsIgnoreCase(userEmail) && ADMIN_PASS.equals(password);
 
                             // LƯU VÀO SharedPreferences
                             SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
-                            sharedPref.saveUser(userId, userEmail, userName);
-                            // chuyển sang trang chính sau khi login thành công
-                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            sharedPref.saveUser(userId, userEmail, userName, isAdmin);
+
+                            if (isAdmin) {
+                                // chuyển sang trang Admin
+                                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                            } else {
+                                // chuyển sang trang chính sau khi login thành công
+                                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            }
                             finish();
                         }
                     } else {

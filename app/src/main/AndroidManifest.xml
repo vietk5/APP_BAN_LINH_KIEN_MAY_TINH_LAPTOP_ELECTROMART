@@ -64,10 +64,10 @@
             android:name=".activity.ForgetPasswordActivity"
             android:exported="false" /> <!-- Trang đăng ký -->
         <activity
-            android:name=".activity.RegisterActivity"
+            android:name=".activity.HomeActivity"
             android:exported="false" /> <!-- Trang mở đầu (FirstPage) -->
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".activity.RegisterActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

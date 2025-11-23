@@ -8,6 +8,7 @@ public class SharedPrefManager {
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_NAME = "name";
+    private static final String KEY_IS_ADMIN = "is_admin";
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -17,13 +18,20 @@ public class SharedPrefManager {
         editor = pref.edit();
     }
 
-    public void saveUser(int id, String email, String name) {
+    // Lưu thông tin user
+    public void saveUser(int id, String email, String name, boolean isAdmin) {
         editor.putInt(KEY_USER_ID, id);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_NAME, name);
+        editor.putBoolean(KEY_IS_ADMIN, isAdmin);
         editor.apply();
     }
 
+    public boolean isAdmin() {
+        return pref.getBoolean(KEY_IS_ADMIN, false);
+    }
+
+    // Kiểm tra user đã login chưa
     public boolean isLoggedIn() {
         return pref.contains(KEY_USER_ID);
     }
@@ -32,6 +40,7 @@ public class SharedPrefManager {
     public String getEmail() { return pref.getString(KEY_EMAIL, null); }
     public String getName() { return pref.getString(KEY_NAME, null); }
 
+    // Xóa thông tin khi logout
     public void logout() {
         editor.clear();
         editor.apply();

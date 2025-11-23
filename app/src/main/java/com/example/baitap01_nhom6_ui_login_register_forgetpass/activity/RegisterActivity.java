@@ -56,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        UserRegisterRequest request = new UserRegisterRequest(name, email, password);
+        UserRegisterRequest request = new UserRegisterRequest(email, password, name);
 
         ApiService apiService = ApiClient.get();
         apiService.register(request).enqueue(new Callback<ApiResponse<Void>>() {
