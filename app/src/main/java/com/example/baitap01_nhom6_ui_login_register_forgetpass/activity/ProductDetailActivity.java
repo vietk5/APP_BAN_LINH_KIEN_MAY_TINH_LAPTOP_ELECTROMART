@@ -1,12 +1,18 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -21,9 +27,11 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.ProductA
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.PriceFormatter;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,21 +45,24 @@ public class ProductDetailActivity extends AppCompatActivity {
     private ApiService api;
     private ImageView img;
     private TextView txtName, txtPrice, txtDesc, txtSpecs;
-
     private RecyclerView rvRelated, rvComments;
 
     private long productId;
-    List<Comment> commentList = new ArrayList<>();
-    EditText edtComment;
-    Button btnSendComment;
+    private SharedPrefManager pref;
 
-
-
+    private List<Comment> commentList = new ArrayList<>();
+    private EditText edtComment;
+    private Button btnSendComment;
+    private RatingBar ratingBar;
+    private TextView txtRatingAvg;    // thêm biến
+    private LinearLayout ratingBars;  // nếu muốn vẽ biểu đồ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
+
+        // đẩy layout xuống khỏi status bar
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
             Insets statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
             v.setPadding(0, statusBars.top, 0, 0);
@@ -59,15 +70,25 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         api = ApiClient.get();
-
+        pref = new SharedPrefManager(this);
         productId = getIntent().getLongExtra("product_id", -1);
 
         initViews();
+        // ⭐ KHÔI PHỤC COMMENT VÀ RATING SAU KHI LOGIN QUAY LẠI
+        String draft = getIntent().getStringExtra("commentDraft");
+        int draftRating = getIntent().getIntExtra("ratingDraft", 0);
+
+        if (draft != null) {
+            edtComment.setText(draft);
+        }
+        if (draftRating > 0) {
+            ratingBar.setRating(draftRating);
+        }
         loadProductDetail();
         loadRelatedProducts();
         loadComments();
+        loadRatingSummary();
         btnSendComment.setOnClickListener(v -> sendComment());
-
     }
 
     private void initViews() {
@@ -82,11 +103,14 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         rvComments = findViewById(R.id.rvComments);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
+
         edtComment = findViewById(R.id.edtComment);
         btnSendComment = findViewById(R.id.btnSendComment);
-
-
+        ratingBar = findViewById(R.id.ratingBar);
+        txtRatingAvg = findViewById(R.id.txtRatingAvg);
+        ratingBars   = findViewById(R.id.ratingBars);
     }
+
 
     private void loadProductDetail() {
         api.getProductById(productId).enqueue(new Callback<ProductDto>() {
@@ -131,6 +155,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
     }
 
+
     private void loadComments() {
         api.getComments(productId).enqueue(new Callback<List<Comment>>() {
             @Override
@@ -143,22 +168,51 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Comment>> call, Throwable t) {
-            }
+            public void onFailure(Call<List<Comment>> call, Throwable t) {}
         });
     }
+
+
     private void sendComment(){
+
+        // 1. yêu cầu đăng nhập
+        if(!pref.isLoggedIn()){
+            showLoginDialog();
+            return;
+        }
+
+        // 2. kiểm tra nội dung comment
         String content = edtComment.getText().toString().trim();
-        if(content.isEmpty()) return;
+        if(content.isEmpty()){
+            edtComment.setError("Bạn chưa nhập bình luận");
+            return;
+        }
 
-        Comment c = new Comment(productId, "User123", content, 5);
+        // 3. kiểm tra số sao
+        int rating = (int) ratingBar.getRating();
+        if(rating == 0){
+            Toast.makeText(this, "Vui lòng đánh giá số sao", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // 4. tạo comment
+        Comment c = new Comment(
+                productId,
+                pref.getName(), // tên user đã lưu
+                content,
+                rating
+        );
+
+        // 5. gửi API
         api.postComment(c).enqueue(new Callback<Comment>() {
             @Override
             public void onResponse(Call<Comment> call, Response<Comment> res) {
                 if(res.isSuccessful()){
+
                     edtComment.setText("");
-                    loadComments(); // reload lại danh sách
+                    ratingBar.setRating(0);
+                    loadComments();
+                    Toast.makeText(ProductDetailActivity.this, "Đã gửi bình luận", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -166,5 +220,68 @@ public class ProductDetailActivity extends AppCompatActivity {
             public void onFailure(Call<Comment> call, Throwable t) {}
         });
     }
+
+
+    private void showLoginDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Cần đăng nhập")
+                .setMessage("Bạn phải đăng nhập để bình luận và đánh giá sản phẩm.")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    Intent i = new Intent(this, LoginActivity.class);
+                    i.putExtra("returnTo", "product_detail");
+                    i.putExtra("productId", productId);
+                    i.putExtra("commentDraft", edtComment.getText().toString());
+                    i.putExtra("ratingDraft", (int) ratingBar.getRating());
+
+                    startActivity(i);
+
+
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+    private void loadRatingSummary() {
+        api.getRatingSummary(productId).enqueue(new Callback<RatingSummary>() {
+            @Override
+            public void onResponse(Call<RatingSummary> call, Response<RatingSummary> res) {
+                if (!res.isSuccessful() || res.body() == null) return;
+
+                RatingSummary s = res.body();
+
+                txtRatingAvg.setText(String.format("%.1f ★", s.avg));
+
+                ratingBars.removeAllViews();
+
+                addRatingRow(5, s.count5, s);
+                addRatingRow(4, s.count4, s);
+                addRatingRow(3, s.count3, s);
+                addRatingRow(2, s.count2, s);
+                addRatingRow(1, s.count1, s);
+            }
+
+            @Override
+            public void onFailure(Call<RatingSummary> call, Throwable t) {}
+        });
+    }
+
+    private void addRatingRow(int star, int count, RatingSummary sum) {
+        View row = getLayoutInflater().inflate(R.layout.item_rating_bar, ratingBars, false);
+
+        TextView tvStar = row.findViewById(R.id.tvStar);
+        ProgressBar bar = row.findViewById(R.id.progressBar);
+        TextView tvCount = row.findViewById(R.id.tvCount);
+
+        tvStar.setText(star + "★");
+        tvCount.setText(String.valueOf(count));
+
+        int total = sum.count1 + sum.count2 + sum.count3 + sum.count4 + sum.count5;
+        int percent = total == 0 ? 0 : (int) ((count * 100f) / total);
+
+        bar.setMax(100);
+        bar.setProgress(percent);
+
+        ratingBars.addView(row);
+    }
+
 
 }

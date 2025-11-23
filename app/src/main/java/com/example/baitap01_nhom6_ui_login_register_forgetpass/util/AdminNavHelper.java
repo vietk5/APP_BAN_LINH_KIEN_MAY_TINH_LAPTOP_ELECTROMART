@@ -11,6 +11,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminCus
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminOrdersActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminProductActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminRevenueActivity;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.LoginActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class AdminNavHelper {
@@ -19,9 +20,6 @@ public class AdminNavHelper {
 
     // Thêm tham số String title vào đây
     public static void setupToolbar(AppCompatActivity act, MaterialToolbar toolbar, String title) {
-        // 1. QUAN TRỌNG: BỎ dòng act.setSupportActionBar(toolbar);
-        // Để Toolbar tự quản lý menu qua XML (app:menu)
-
         // 2. Set title trực tiếp từ tham số truyền vào
         toolbar.setTitle(title);
 
@@ -54,9 +52,8 @@ public class AdminNavHelper {
                 if (act instanceof AdminRevenueActivity) return true;
                 intent = new Intent(act, AdminRevenueActivity.class);
             } else if (id == R.id.nav_logout) {
-                Toast.makeText(act, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
-                // TODO: Thêm logic xóa token/session và chuyển về LoginActivity
-                return true;
+                if (act instanceof LoginActivity) return true;
+                intent = new Intent(act, LoginActivity.class);
             } else if (id == R.id.nav_admin) {
                 if (act instanceof AdminActivity) return true;
                 // Nếu muốn quay về Dashboard và xóa hết các màn hình cũ trong stack

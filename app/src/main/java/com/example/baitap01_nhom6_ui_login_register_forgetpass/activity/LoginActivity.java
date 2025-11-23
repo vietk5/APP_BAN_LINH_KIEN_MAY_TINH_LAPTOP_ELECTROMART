@@ -24,11 +24,17 @@ public class LoginActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;
     Button btnLogin;
     TextView tvSignup, tvForgotPass;
+    String returnTo = null;     // ⭐ NEW
+    long returnProductId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        returnTo = getIntent().getStringExtra("returnTo");
+        returnProductId = getIntent().getLongExtra("productId", -1);
+        String draftComment = getIntent().getStringExtra("commentDraft");
+        int draftRating = getIntent().getIntExtra("ratingDraft", 0);
 
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
@@ -41,6 +47,19 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+//        tvSignup.setOnClickListener(v -> {
+//            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+//
+//            // gửi lại toàn bộ dữ liệu cũ
+//            intent.putExtra("returnTo", returnTo);
+//            intent.putExtra("productId", returnProductId);
+//
+//            intent.putExtra("commentDraft", draftComment);
+//            intent.putExtra("ratingDraft", draftRating);
+//
+//            startActivity(intent);
+//        });
+
 
         // Chuyển sang trang quên mật khẩu
         tvForgotPass.setOnClickListener(v -> {
@@ -96,6 +115,20 @@ public class LoginActivity extends AppCompatActivity {
                             // LƯU VÀO SharedPreferences
                             SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
                             sharedPref.saveUser(userId, userEmail, userName, isAdmin);
+                            // nếu dang bình luận mà bắt đăng nhập
+                            if ("product_detail".equals(returnTo) && returnProductId != -1) {
+
+                                Intent back = new Intent(LoginActivity.this, ProductDetailActivity.class);
+                                back.putExtra("product_id", returnProductId);
+
+                                // ⭐ TRẢ LẠI COMMENT DRAFT
+                                back.putExtra("commentDraft", draftComment);
+                                back.putExtra("ratingDraft", draftRating);
+
+                                startActivity(back);
+                                finish();
+                                return;
+                            }
 
                             if (isAdmin) {
                                 // chuyển sang trang Admin
