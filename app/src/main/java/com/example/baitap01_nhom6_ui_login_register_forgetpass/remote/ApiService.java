@@ -1,11 +1,13 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.remote;
 
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.BrandDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ForgotPasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.PageResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ResetPasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
@@ -123,5 +125,20 @@ public interface ApiService {
     // Xóa tài khoản
     @DELETE("/api/admin/customers/{id}")
     Call<Void> deleteCustomer(@Path("id") long customerId);
+
+    @GET("api/products/{id}/related")
+    Call<List<ProductDto>> getRelated(@Path("id") long id);
+
+    @GET("api/comments/{productId}")
+    Call<List<Comment>> getComments(@Path("productId") long productId);
+
+    @POST("api/comments")
+    Call<Comment> postComment(@Body Comment comment);
+    @GET("api/products/{id}")
+    Call<ProductDto> getProductById(@Path("id") long id);
+    // lâys dữ liệu tỷ lệ rate
+    @GET("api/products/{id}/rating-summary")
+    Call<RatingSummary> getRatingSummary(@Path("id") long id);
+
 
 }

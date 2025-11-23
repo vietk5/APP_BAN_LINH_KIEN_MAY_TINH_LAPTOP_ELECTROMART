@@ -123,7 +123,13 @@ public class HomeActivity extends AppCompatActivity {
             String brand = d.brand != null ? d.brand : "";
             String key = (name + " " + brand).toLowerCase();
 
-            Product ui = new Product(name, vnd(d.price), d.imageUrl);
+            Product ui = new Product(
+                    d.id,
+                    d.name,
+                    vnd(d.price),
+                    d.imageUrl
+            );
+
 
             // Laptop
             if (key.contains("laptop") || key.contains("notebook") || key.contains("macbook")) {

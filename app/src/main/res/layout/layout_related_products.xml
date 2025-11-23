@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_marginTop="20dp"
+    android:layout_height="wrap_content">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:text="Sản phẩm liên quan"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!-- Danh sách sản phẩm liên quan (scroll ngang) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRelated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never" />
+</LinearLayout>
