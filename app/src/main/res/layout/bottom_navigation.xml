@@ -61,6 +61,7 @@
 
     <!-- Consult Button (Tư vấn) - In the center -->
     <LinearLayout
+        android:id="@+id/btnConsult"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -70,8 +71,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_handshake"
-            app:tint="#0A1EDC"/> <!-- Change this color to highlight -->
-        <!-- You can add a badge or notification count here -->
+            app:tint="#0A1EDC"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

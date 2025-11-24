@@ -38,6 +38,7 @@
                 android:gravity="center_vertical">
 
                 <ImageView
+                    android:id="@+id/btnSearch"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginEnd="8dp"
@@ -46,6 +47,7 @@
                     android:contentDescription="@string/app_name" />
 
                 <EditText
+                    android:id="@+id/edtSearch"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -87,8 +89,9 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <!-- Button PC Gaming -->
+                    <!-- Button PC -->
                     <Button
+                        android:id="@+id/btnTabPc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PC"
@@ -102,6 +105,7 @@
 
                     <!-- Button Laptop -->
                     <Button
+                        android:id="@+id/btnTabLaptop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Laptop"
@@ -115,6 +119,7 @@
 
                     <!-- Button Tai nghe  -->
                     <Button
+                        android:id="@+id/btnTabHeadphone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tai nghe"
@@ -128,6 +133,7 @@
 
                     <!-- Button Màn hình -->
                     <Button
+                        android:id="@+id/btnTabMonitor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Màn hình"
@@ -141,6 +147,7 @@
 
                     <!-- Button Bàn phím -->
                     <Button
+                        android:id="@+id/btnTabKeyboard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Bàn phím"
@@ -154,6 +161,7 @@
 
                     <!-- Button Chuột -->
                     <Button
+                        android:id="@+id/btnTabMouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chuột"
@@ -167,14 +175,14 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!-- 🖼️ Banner quảng cáo -->
-            <ImageView
+            <!-- 🖼️ Banner quảng cáo -> SLIDER -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/bannerViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="8dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/hero_3" />
+                android:layout_marginBottom="8dp" />
+
 
             <!-- ⚡ Flash Sale -->
             <LinearLayout

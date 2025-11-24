@@ -16,10 +16,19 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.ConsultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.NotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".activity.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".activity.MyOrdersActivity"
@@ -79,7 +88,7 @@
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name=".activity.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
