@@ -61,19 +61,25 @@
             android:name=".activity.AdminActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ProfileActivity"
-            android:exported="false" /> <!-- Trang quên mật khẩu -->
+            android:name=".activity.OrderConfirmationActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.ProductEntryActivity"
             android:exported="false" />
         <activity
             android:name=".activity.ForgetPasswordActivity"
-            android:exported="false" /> <!-- Trang đăng ký -->
+            android:exported="false" />
         <activity
             android:name=".activity.RegisterActivity"
-            android:exported="false" /> <!-- Trang mở đầu (FirstPage) -->
+            android:exported="false" />
         <activity
-            android:name=".activity.OrderConfirmationActivity"
+            android:name=".activity.UpdateProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ProfileActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

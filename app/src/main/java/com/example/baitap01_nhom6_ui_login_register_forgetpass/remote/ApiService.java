@@ -3,12 +3,14 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.remote;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.BrandDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ChangePasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ForgotPasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.PageResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ResetPasswordRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UpdateProfileRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserRegisterRequest;
@@ -28,6 +30,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -94,7 +97,7 @@ public interface ApiService {
             @Query("groupBy") String groupBy  // "DAY" / "MONTH" / "YEAR"
     );
 
-    // Quên mật khẩu
+    // ======== FORGOT PASSWORD ===========
     @POST("api/auth/forgot-password")
     Call<ApiResponse<Void>> forgotPassword(@Body ForgotPasswordRequest request);
 
@@ -103,6 +106,25 @@ public interface ApiService {
 
     @POST("api/auth/reset-password")
     Call<ApiResponse<Void>> resetPassword(@Body ResetPasswordRequest request);
+
+    // ======== PROFILE (USER) ===========
+    // Lấy thông tin profile theo userId
+    @GET("api/profile/{userId}")
+    Call<ApiResponse<UserDto>> getProfile(@Path("userId") Long userId);
+
+    // Cập nhật thông tin cá nhân
+    @PUT("api/profile/{userId}")
+    Call<ApiResponse<UserDto>> updateProfile(
+            @Path("userId") Long userId,
+            @Body UpdateProfileRequest request
+    );
+
+    // Đổi mật khẩu
+    @PUT("api/profile/{userId}/change-password")
+    Call<ApiResponse<Void>> changePassword(
+            @Path("userId") Long userId,
+            @Body ChangePasswordRequest request
+    );
 
     @POST("/api/admin/products")
     Call<AdminProductDto> createProduct(@Body AdminProductDto product);
