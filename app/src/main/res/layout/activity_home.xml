@@ -54,6 +54,7 @@
                     android:paddingHorizontal="10dp" />
 
                 <ImageView
+                    android:id="@+id/btnCartHeader"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="12dp"
