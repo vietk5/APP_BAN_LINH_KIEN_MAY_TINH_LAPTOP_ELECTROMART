@@ -30,15 +30,17 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
-    RecyclerView recyclerFlashSale, recyclerProducts, recyclerNewProducts, recyclerLaptops, recyclerHeadphones;
+    RecyclerView recyclerFlashSale, recyclerProducts, recyclerNewProducts, recyclerLaptops, recyclerHeadphones, recyclerSound, recyclerPc;
 
     private final List<Product> flashData = new ArrayList<>();
     private final List<Product> hotData   = new ArrayList<>();
     private final List<Product> newData   = new ArrayList<>();
     private final List<Product> lapData   = new ArrayList<>();
+    private final List<Product> headPhoneData   = new ArrayList<>();
+    private final List<Product> pcData   = new ArrayList<>();
     private final List<Product> soundData = new ArrayList<>();
 
-    private ProductAdapter flashAdp, hotAdp, newAdp, lapAdp, soundAdp;
+    private ProductAdapter flashAdp, hotAdp, newAdp, lapAdp, soundAdp, pcAdp, headPhoneAdp;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,36 +58,42 @@ public class HomeActivity extends AppCompatActivity {
         recyclerNewProducts= findViewById(R.id.recyclerNewProducts);
         recyclerLaptops    = findViewById(R.id.recyclerLaptops);
         recyclerHeadphones = findViewById(R.id.recyclerHeadphones);
+        recyclerSound      = findViewById(R.id.recyclerSpeakers);
+        recyclerPc         = findViewById(R.id.recyclerPCs);
+
 
         recyclerFlashSale.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerNewProducts.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerLaptops.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerHeadphones.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerSound.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerPc.setLayoutManager(new GridLayoutManager(this, 2));
+
 
         flashAdp = new ProductAdapter(flashData);
         hotAdp   = new ProductAdapter(hotData);
         newAdp   = new ProductAdapter(newData);
         lapAdp   = new ProductAdapter(lapData);
         soundAdp = new ProductAdapter(soundData);
+        pcAdp = new ProductAdapter(pcData);
+        headPhoneAdp = new ProductAdapter(headPhoneData);
+
 
         recyclerFlashSale.setAdapter(flashAdp);
         recyclerProducts.setAdapter(hotAdp);
         recyclerNewProducts.setAdapter(newAdp);
         recyclerLaptops.setAdapter(lapAdp);
-        recyclerHeadphones.setAdapter(soundAdp);
+        recyclerHeadphones.setAdapter(headPhoneAdp);
+        recyclerSound.setAdapter(soundAdp);
+        recyclerPc.setAdapter(pcAdp);
+
 
         loadProducts(); // <-- gọi API
         // chuyen sang trang ca nhan cua nguoi dung
         LinearLayout btnUser = findViewById(R.id.btnUser);
         btnUser.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        });
-        // chuyen sang gio hang
-        LinearLayout btnCart = findViewById(R.id.btnCart);
-        btnCart.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, CartActivity.class);
             startActivity(intent);
         });
     }
@@ -115,16 +123,32 @@ public class HomeActivity extends AppCompatActivity {
             String brand = d.brand != null ? d.brand : "";
             String key = (name + " " + brand).toLowerCase();
 
-            Product ui = new Product(name, vnd(d.price), d.imageUrl);
+            Product ui = new Product(
+                    d.id,
+                    d.name,
+                    vnd(d.price),
+                    d.imageUrl
+            );
+
 
             // Laptop
             if (key.contains("laptop") || key.contains("notebook") || key.contains("macbook")) {
                 lapData.add(ui);
                 continue;
             }
-            // Tai nghe - Loa
-            if (key.contains("tai nghe") || key.contains("headset") || key.contains("loa") || key.contains("speaker")) {
+            // Tai nghe
+            if (key.contains("tai nghe") || key.contains("headset")) {
+                headPhoneData.add(ui);
+                continue;
+            }
+            // loa
+            if ( key.contains("loa") || key.contains("speaker")) {
                 soundData.add(ui);
+                continue;
+            }
+            // pc
+            if (key.contains("pc") || key.contains("case") ) {
+                pcData.add(ui);
                 continue;
             }
             // Flash sale (demo: cho các sản phẩm có giá < 1.5tr)
@@ -148,6 +172,8 @@ public class HomeActivity extends AppCompatActivity {
         newAdp.notifyDataSetChanged();
         lapAdp.notifyDataSetChanged();
         soundAdp.notifyDataSetChanged();
+        pcAdp.notifyDataSetChanged();
+        headPhoneAdp.notifyDataSetChanged();
     }
 
     private String vnd(long price) {

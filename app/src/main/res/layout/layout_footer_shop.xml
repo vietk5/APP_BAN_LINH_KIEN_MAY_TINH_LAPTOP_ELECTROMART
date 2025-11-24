@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="#F5F7FA"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="2dp"
+    android:gravity="center_vertical"
+    android:layout_marginTop="20dp">
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/imgFooterLogo"
+        android:src="@drawable/logo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/bg_gradient"
+        android:padding="10dp" />
+
+    <!-- Text khu vực -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginLeft="12dp"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="ElectroMart - Linh kiện PC &amp; Laptop"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#222"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="📍 Số 1, Võ Văn Ngân, Thủ Đức, TPHCM"
+            android:textSize="14sp"
+            android:textColor="#555"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="📞 0909 123 456"
+            android:textSize="14sp"
+            android:textColor="#555"
+            android:layout_marginTop="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="✉ admin@electromart.com"
+            android:textSize="14sp"
+            android:textColor="#555"
+            android:layout_marginTop="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</LinearLayout>

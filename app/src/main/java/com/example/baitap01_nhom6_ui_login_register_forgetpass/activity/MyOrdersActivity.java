@@ -22,8 +22,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyOrdersActivity extends AppCompatActivity
-        implements MyOrdersAdapter.OnOrderClickListener {
+public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapter.OnOrderClickListener {
     private ImageView btnBack;
     private EditText edtSearch;
     private TabLayout tabLayout;
