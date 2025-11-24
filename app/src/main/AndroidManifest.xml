@@ -16,6 +16,12 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.MyOrdersActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ResetPasswordActivity"
             android:exported="false" />
         <activity
@@ -64,7 +70,7 @@
             android:name=".activity.RegisterActivity"
             android:exported="false" /> <!-- Trang mở đầu (FirstPage) -->
         <activity
-            android:name=".activity.HomeActivity"
+            android:name=".activity.OrderConfirmationActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
