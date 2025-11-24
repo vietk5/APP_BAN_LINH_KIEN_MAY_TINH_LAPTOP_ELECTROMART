@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.CartItem;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 
 import java.text.NumberFormat;
@@ -20,40 +21,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
-
-    // ====== MODEL NỘI BỘ CHO CART (không cần tạo file riêng) ======
-    public static class CartItem {
-        private final Product product;
-        private int quantity;
-        private boolean selected;
-
-        public CartItem(Product product, int quantity, boolean selected) {
-            this.product = product;
-            this.quantity = quantity;
-            this.selected = selected;
-        }
-
-        public Product getProduct() {
-            return product;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            if (quantity < 1) quantity = 1;
-            this.quantity = quantity;
-        }
-
-        public boolean isSelected() {
-            return selected;
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected = selected;
-        }
-    }
 
     // ====== CALLBACK VỀ ACTIVITY ======
     public interface OnCartChangeListener {
