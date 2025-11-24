@@ -30,6 +30,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Produc
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.singleton.CartManager;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.PriceFormatter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
 
@@ -48,11 +49,12 @@ public class ProductDetailActivity extends AppCompatActivity {
     private RecyclerView rvRelated, rvComments;
 
     private long productId;
+    private Product currentProduct;
     private SharedPrefManager pref;
 
     private List<Comment> commentList = new ArrayList<>();
     private EditText edtComment;
-    private Button btnSendComment;
+    private Button btnSendComment, btnBuyNow, btnAddToCart;
     private RatingBar ratingBar;
     private TextView txtRatingAvg;    // thêm biến
     private LinearLayout ratingBars;  // nếu muốn vẽ biểu đồ
@@ -89,6 +91,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         loadComments();
         loadRatingSummary();
         btnSendComment.setOnClickListener(v -> sendComment());
+        btnBuyNow.setOnClickListener(v -> handleBuyNow());
+        btnAddToCart.setOnClickListener(v -> handleAddToCart());
     }
 
     private void initViews() {
@@ -106,9 +110,35 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         edtComment = findViewById(R.id.edtComment);
         btnSendComment = findViewById(R.id.btnSendComment);
+        btnBuyNow = findViewById(R.id.btnBuyNow);
+        btnAddToCart = findViewById(R.id.btnAddToCart);
         ratingBar = findViewById(R.id.ratingBar);
         txtRatingAvg = findViewById(R.id.txtRatingAvg);
         ratingBars   = findViewById(R.id.ratingBars);
+    }
+    private void handleBuyNow() {
+        if (pref.isLoggedIn()) {
+            if (currentProduct != null) {
+                CartManager.getInstance().addProduct(currentProduct);
+            }
+            Intent intent = new Intent(this, CartActivity.class);
+            startActivity(intent);
+        } else {
+            showLoginDialog();
+        }
+    }
+
+    private void handleAddToCart() {
+        if (pref.isLoggedIn()) {
+            if (currentProduct != null) {
+                CartManager.getInstance().addProduct(currentProduct);
+                Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Không thể thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            showLoginDialog();
+        }
     }
 
 
@@ -119,6 +149,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                 if (!res.isSuccessful() || res.body() == null) return;
 
                 ProductDto p = res.body();
+                currentProduct = new Product(p.getId(), p.getName(), String.valueOf(p.getPrice()), p.getImageUrl());
                 txtName.setText(p.getName());
                 txtPrice.setText(PriceFormatter.vnd(p.getPrice()));
                 txtDesc.setText("Hàng mới 100%, bảo hành 24 tháng");
@@ -225,7 +256,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void showLoginDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Cần đăng nhập")
-                .setMessage("Bạn phải đăng nhập để bình luận và đánh giá sản phẩm.")
+                .setMessage("Bạn phải đăng nhập để thực hiện chức năng này.")
                 .setPositiveButton("Đăng nhập", (dialog, which) -> {
                     Intent i = new Intent(this, LoginActivity.class);
                     i.putExtra("returnTo", "product_detail");
