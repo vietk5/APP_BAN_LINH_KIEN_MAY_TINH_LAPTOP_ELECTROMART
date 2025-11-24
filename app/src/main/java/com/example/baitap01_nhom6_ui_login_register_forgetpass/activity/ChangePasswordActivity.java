@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import retrofit2.Response;
 public class ChangePasswordActivity extends AppCompatActivity {
 
     private EditText etNewPassword, etReNewPassword;
+    private TextView etEmail;
     private LinearLayout btnChangePassword;
     private ProgressBar progressBar;
 
@@ -50,10 +52,19 @@ public class ChangePasswordActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        etEmail = findViewById(R.id.etEmail);
         etNewPassword = findViewById(R.id.etNewPassword);
         etReNewPassword = findViewById(R.id.etReNewPassword);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         progressBar = findViewById(R.id.progress_bar);
+
+        // LẤY EMAIL TỪ SHAREDPREF
+        String email = sharedPref.getEmail();
+        if (email != null) {
+            etEmail.setText(email);
+            etEmail.setEnabled(false); // không cho user sửa email
+        }
+
 
         btnChangePassword.setOnClickListener(v -> changePassword());
     }
