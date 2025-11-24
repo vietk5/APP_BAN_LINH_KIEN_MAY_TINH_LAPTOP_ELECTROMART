@@ -4,6 +4,7 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 import  android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
@@ -94,6 +95,17 @@ public class HomeActivity extends AppCompatActivity {
         LinearLayout btnUser = findViewById(R.id.btnUser);
         btnUser.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        });
+        ImageView btnCartHeader = findViewById(R.id.btnCartHeader);
+        btnCartHeader.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
+
+        LinearLayout btnCart = findViewById(R.id.btnCart);
+        btnCart.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, CartActivity.class);
             startActivity(intent);
         });
     }
