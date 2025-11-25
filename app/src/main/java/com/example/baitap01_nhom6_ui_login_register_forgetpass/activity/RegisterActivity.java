@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
                         finish();
                     }
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Lỗi server", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Email đã tồn tại, vu lòng nhập email khác", Toast.LENGTH_SHORT).show();
                 }
             }
 
