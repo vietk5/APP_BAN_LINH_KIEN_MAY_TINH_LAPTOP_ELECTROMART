@@ -139,7 +139,9 @@ public class ProfileActivity extends AppCompatActivity {
         // Đơn hàng của tôi
         menuOrders.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, MyOrdersActivity.class);
-            startActivityForResult(intent, 100);
+//            startActivityForResult(intent, 100);
+            startActivity(intent);
+//            finish();
         });
 
         // Xem/Sửa thông tin cá nhân

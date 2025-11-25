@@ -1,6 +1,7 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,8 +64,6 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         holder.tvOrderStatus.setTextColor(statusColor);
         holder.imgStatusDot.setColorFilter(statusColor);
 
-
-
         // Set thông tin giao hàng
         String shippingType = "Nhận tại cửa hàng"; // hoặc "Giao tận nơi"
         holder.tvShippingInfo.setText(shippingType + " • #" + order.getOrderId());
@@ -89,13 +88,15 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
                 holder.imgProduct.setImageResource(R.drawable.placeholder_product);
             }
 
-            // Hiển thị số sản phẩm khác nếu có nhiều hơn 1
+            // ===== SỬA PHẦN NÀY =====
+            // Hiển thị số sản phẩm khác nếu có nhiều hơn 1 loại
             if (order.getProducts().size() > 1) {
                 holder.tvProductCount.setVisibility(View.VISIBLE);
                 holder.tvProductCount.setText("+" + (order.getProducts().size() - 1) + " sản phẩm khác");
             } else {
                 holder.tvProductCount.setVisibility(View.GONE);
             }
+            // ===== HẾT PHẦN SỬA =====
         }
 
         // Click listeners
@@ -112,7 +113,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         });
 
         // Ẩn/hiện nút Mua lại
-        if (order.getStatus().equals("COMPLETED") || order.getStatus().equals("CANCELLED")) {
+        if (order.getStatus().equals("HOAN_THANH") || order.getStatus().equals("DA_HUY")) {
             holder.btnReorder.setVisibility(View.VISIBLE);
         } else {
             holder.btnReorder.setVisibility(View.GONE);
@@ -143,13 +144,13 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
     private String getStatusText(String status) {
         if (status == null) return "";
         switch (status) {
-            case "PROCESSING":
+            case "DANG_XU_LY":
                 return "Đang xử lý";
-            case "SHIPPING":
+            case "DANG_GIAO":
                 return "Đang giao";
-            case "COMPLETED":
+            case "HOAN_THANH":
                 return "Đã giao";
-            case "CANCELLED":
+            case "DA_HUY":
                 return "Đã hủy";
             default:
                 return status;
@@ -159,14 +160,14 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
     private int getStatusColor(String status) {
         if (status == null) return 0xFF757575;
         switch (status) {
-            case "PROCESSING":
-                return 0xFFFFA726; // Orange
-            case "SHIPPING":
-                return 0xFF1976D2; // Blue
-            case "COMPLETED":
-                return 0xFF4CAF50; // Green
-            case "CANCELLED":
-                return 0xFFF44336; // Red
+            case "DANG_XU_LY":
+                return 0xFFFFA726; // Cam
+            case "DANG_GIAO":
+                return 0xFF1976D2; // Xanh dương
+            case "HOAN_THANH":
+                return 0xFF4CAF50; // Xanh lá
+            case "DA_HUY":
+                return 0xFFF44336; // Đỏ
             default:
                 return 0xFF757575; // Gray
         }

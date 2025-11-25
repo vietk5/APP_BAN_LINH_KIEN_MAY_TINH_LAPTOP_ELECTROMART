@@ -5,6 +5,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiRes
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.BrandDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ChangePasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ForgotPasswordRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.PageResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
@@ -162,5 +163,6 @@ public interface ApiService {
     @GET("api/products/{id}/rating-summary")
     Call<RatingSummary> getRatingSummary(@Path("id") long id);
 
-
+    @GET("api/user/orders/{userId}")
+    Call<OrderDetailDto> getOrdersByUserId(@Path("userId") long userId);
 }
