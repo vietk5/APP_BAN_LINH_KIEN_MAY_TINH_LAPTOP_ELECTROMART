@@ -138,8 +138,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupClickListeners() {
         // Đơn hàng của tôi
         menuOrders.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show();
-            // Chuyển sang OrdersActivity
+            Intent intent = new Intent(ProfileActivity.this, MyOrdersActivity.class);
+            startActivityForResult(intent, 100);
         });
 
         // Xem/Sửa thông tin cá nhân
