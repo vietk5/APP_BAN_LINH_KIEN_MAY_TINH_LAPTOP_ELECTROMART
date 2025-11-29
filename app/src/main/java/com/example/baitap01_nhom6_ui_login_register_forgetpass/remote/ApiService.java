@@ -22,6 +22,9 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.AdminP
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.AdminOrderDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.AdminCustomerDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RevenuePointDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartItemDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
 
 
 import java.util.List;
@@ -163,6 +166,16 @@ public interface ApiService {
     @GET("api/products/{id}/rating-summary")
     Call<RatingSummary> getRatingSummary(@Path("id") long id);
 
-    @GET("api/user/orders/{userId}")
-    Call<OrderDetailDto> getOrdersByUserId(@Path("userId") long userId);
+    @GET("api/user/orders/by-user/{userId}")
+    Call<List<OrderDetailDto>> getOrdersByUserId(@Path("userId") long userId);
+
+    // them, lay gio hang
+    @POST("api/cart/add")
+    Call<Void> addToCart(@Body CartRequest request);
+
+    @GET("api/cart/{userId}")
+    Call<List<CartItemDto>> getCart(@Path("userId") int userId);
+    @POST("api/cart/checkout")
+    Call<Void> checkout(@Body CheckoutRequest request);
+
 }

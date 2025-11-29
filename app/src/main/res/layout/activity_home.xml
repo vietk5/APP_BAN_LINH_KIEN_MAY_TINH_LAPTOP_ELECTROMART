@@ -49,11 +49,12 @@
                 <EditText
                     android:id="@+id/edtSearch"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="38dp"
                     android:layout_weight="1"
                     android:background="@drawable/edit_text_bg"
                     android:hint="Nhập link hoặc tên sản phẩm"
-                    android:paddingHorizontal="10dp" />
+                    android:paddingHorizontal="10dp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageView
                     android:id="@+id/btnCartHeader"
@@ -64,19 +65,20 @@
                     app:tint="#3B82F6" />
             </LinearLayout>
 
-            <!-- 📍 Chào mừng người dùng -->
+            <!-- 📍 Chào mừng người dùng (nhỏ gọn hơn) -->
             <TextView
                 android:id="@+id/tvWelcomeMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="12dp"
                 android:text="Chào mừng bạn đến với ElectroMart"
-                android:textSize="16sp"
+                android:textAlignment="center"
                 android:textColor="#111827"
-                android:layout_marginTop="16dp"
-                android:padding="16dp"
-                android:textAlignment="center" />
+                android:textSize="12sp" />
 
-            <!-- 🔹 Tabs danh mục -->
+            <!-- 🔹 Tabs danh mục (custom item: icon + text) -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -89,89 +91,209 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <!-- Button PC -->
-                    <Button
+                    <!-- ==== ITEM PC ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabPc"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="PC"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
 
-                    <!-- Button Laptop -->
-                    <Button
+                        <ImageView
+                            android:id="@+id/imgTabPc"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/tab_button_bg2"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_pc"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="PC"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <!-- ==== ITEM LAPTOP ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabLaptop"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Laptop"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
 
-                    <!-- Button Tai nghe  -->
-                    <Button
+                        <ImageView
+                            android:id="@+id/imgTabLaptop"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/tab_button_bg2"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_laptop"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Laptop"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <!-- ==== ITEM TAI NGHE ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabHeadphone"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Tai nghe"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
 
-                    <!-- Button Màn hình -->
-                    <Button
+                        <ImageView
+                            android:id="@+id/imgTabHeadphone"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/tab_button_bg2"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_headphones"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Tai nghe"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <!-- ==== ITEM MÀN HÌNH ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabMonitor"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Màn hình"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
 
-                    <!-- Button Bàn phím -->
-                    <Button
+                        <ImageView
+                            android:id="@+id/imgTabMonitor"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/tab_button_bg2"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_monitor"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Màn hình"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <!-- ==== ITEM BÀN PHÍM ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabKeyboard"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Bàn phím"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
 
-                    <!-- Button Chuột -->
-                    <Button
+                        <ImageView
+                            android:id="@+id/imgTabKeyboard"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/tab_button_bg2"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_keyboard"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Bàn phím"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
+                    <!-- ==== ITEM CHUỘT ==== -->
+                    <LinearLayout
                         android:id="@+id/btnTabMouse"
-                        android:layout_width="wrap_content"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="Chuột"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/tab_button_bg1"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:padding="4dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:id="@+id/imgTabMouse"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/tab_button_bg2"
+                            android:padding="12dp"
+                            android:src="@drawable/ic_mouse"
+                            android:scaleType="centerInside"
+                            android:adjustViewBounds="true"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Chuột"
+                            android:textSize="12sp"
+                            android:textColor="#111827" />
+                    </LinearLayout>
+
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -182,7 +304,6 @@
                 android:layout_height="150dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="8dp" />
-
 
             <!-- ⚡ Flash Sale -->
             <LinearLayout
@@ -205,7 +326,7 @@
                         android:text="⚡ FLASH SALE"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/tvCountdown"
@@ -237,7 +358,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerProducts"
@@ -245,7 +366,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
             <!-- 🆕 Sản phẩm mới -->
             <TextView
@@ -256,7 +377,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerNewProducts"
@@ -264,7 +385,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
             <!-- 💻 Laptop -->
             <TextView
@@ -275,7 +396,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerLaptops"
@@ -283,7 +404,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
             <!-- 🖥️ PC -->
             <TextView
@@ -294,7 +415,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerPCs"
@@ -302,7 +423,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
             <!-- 🎧 Tai nghe -->
             <TextView
@@ -313,7 +434,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerHeadphones"
@@ -321,7 +442,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
             <!-- 🔊 Loa -->
             <TextView
@@ -332,7 +453,7 @@
                 android:textStyle="bold"
                 android:paddingHorizontal="16dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSpeakers"
@@ -340,7 +461,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="8dp"
-                android:clipToPadding="false"/>
+                android:clipToPadding="false" />
 
         </LinearLayout>
     </ScrollView>

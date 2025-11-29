@@ -1,14 +1,12 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,6 +29,8 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.ProductA
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import  com.example.baitap01_nhom6_ui_login_register_forgetpass.util.BottomNavHelper;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -62,21 +62,23 @@ public class HomeActivity extends AppCompatActivity {
     private EditText edtSearch;
     private ImageView btnSearch, btnCartHeader, btnNotification;
 
-    // tab nhanh
-    private Button btnTabPc, btnTabLaptop, btnTabHeadphone,
+    // tab nhanh (layout mới)
+    private LinearLayout btnTabPc, btnTabLaptop, btnTabHeadphone,
             btnTabMonitor, btnTabKeyboard, btnTabMouse;
-
-    // bottom nav
-    private LinearLayout btnHome, btnCategory, btnConsult, btnCart, btnUser;
 
     // banner slider
     private ViewPager2 bannerViewPager;
     private BannerAdapter bannerAdapter;
+
+    // shared pref
+    private SharedPrefManager sharedPrefManager;
+
     private final List<Integer> bannerImages = Arrays.asList(
             R.drawable.hero_1,
             R.drawable.hero_2,
             R.drawable.hero_3
     );
+
     private final Handler bannerHandler = new Handler(Looper.getMainLooper());
     private final Runnable bannerRunnable = new Runnable() {
         @Override
@@ -95,6 +97,8 @@ public class HomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
 
+        sharedPrefManager = new SharedPrefManager(this);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header), (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), v.getPaddingBottom());
@@ -104,11 +108,11 @@ public class HomeActivity extends AppCompatActivity {
         initViews();
         setupRecyclerViews();
         setupBannerSlider();
-        updateWelcomeMessage();   // <--- dòng chào mừng theo trạng thái login
+        updateWelcomeMessage();   // dòng chào mừng theo trạng thái login
         setupHeaderActions();
-        setupTabQuickSearch();    // <--- các nút PC, Laptop, Tai nghe...
-        setupBottomNavActions();
+        setupTabQuickSearch();    // tab danh mục mới
         loadProducts();
+        BottomNavHelper.setup(this, "HOME");
     }
 
     private void initViews() {
@@ -126,35 +130,27 @@ public class HomeActivity extends AppCompatActivity {
         btnCartHeader    = findViewById(R.id.btnCartHeader);
         btnNotification  = findViewById(R.id.btnNotification); // trong header_layout
 
+        // tab nhanh: bây giờ là LinearLayout, không còn Button nữa
         btnTabPc        = findViewById(R.id.btnTabPc);
         btnTabLaptop    = findViewById(R.id.btnTabLaptop);
         btnTabHeadphone = findViewById(R.id.btnTabHeadphone);
         btnTabMonitor   = findViewById(R.id.btnTabMonitor);
         btnTabKeyboard  = findViewById(R.id.btnTabKeyboard);
         btnTabMouse     = findViewById(R.id.btnTabMouse);
-
-        btnHome     = findViewById(R.id.btnHome);
-        btnCategory = findViewById(R.id.btnCategory);
-        btnConsult  = findViewById(R.id.btnConsult);
-        btnCart     = findViewById(R.id.btnCart);
-        btnUser     = findViewById(R.id.btnUser);
-
         bannerViewPager = findViewById(R.id.bannerViewPager);
     }
 
     /** Dòng chào mừng: nếu đã login thì hiện tên khách hàng */
     private void updateWelcomeMessage() {
-        // GIẢ SỬ bạn lưu thông tin login trong SharedPreferences như thế này.
-        // Nếu project bạn dùng tên khác, chỉ cần đổi "USER_PREFS", "isLoggedIn", "fullName".
-        SharedPreferences prefs = getSharedPreferences("USER_PREFS", MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
-        String customerName = prefs.getString("fullName", null);
-
-        if (isLoggedIn && customerName != null && !customerName.isEmpty()) {
-            tvWelcomeMessage.setText("Chào mừng " + customerName + " đến với ElectroMart");
-        } else {
-            tvWelcomeMessage.setText("Chào mừng bạn đến với ElectroMart");
+        if (sharedPrefManager != null && sharedPrefManager.isLoggedIn()) {
+            String customerName = sharedPrefManager.getName();
+            if (customerName != null && !customerName.trim().isEmpty()) {
+                tvWelcomeMessage.setText("Chào mừng bạn " + customerName + " đến với ElectroMart");
+                return;
+            }
         }
+        // mặc định khi chưa login / không có tên
+        tvWelcomeMessage.setText("Chào mừng bạn đến với ElectroMart");
     }
 
     private void setupRecyclerViews() {
@@ -228,14 +224,30 @@ public class HomeActivity extends AppCompatActivity {
         openSearchWithKeyword(keyword);
     }
 
-    /** Tab nhanh: PC, Laptop, Tai nghe, ... */
+    /** Helper: gắn sự kiện cho 1 tab danh mục (cả layout + icon) */
+    private void setupCategoryTab(LinearLayout tab, int imageViewId, String keyword) {
+        if (tab == null) return;
+
+        View.OnClickListener listener = v -> openSearchWithKeyword(keyword);
+
+        // click cả vào "card"
+        tab.setOnClickListener(listener);
+
+        // click riêng vào icon (đúng yêu cầu “bấm vào cái ảnh”)
+        ImageView img = tab.findViewById(imageViewId);
+        if (img != null) {
+            img.setOnClickListener(listener);
+        }
+    }
+
+    /** Tab nhanh: PC, Laptop, Tai nghe, ... (dùng layout mới) */
     private void setupTabQuickSearch() {
-        btnTabPc.setOnClickListener(v -> openSearchWithKeyword("PC"));
-        btnTabLaptop.setOnClickListener(v -> openSearchWithKeyword("Laptop"));
-        btnTabHeadphone.setOnClickListener(v -> openSearchWithKeyword("Tai nghe"));
-        btnTabMonitor.setOnClickListener(v -> openSearchWithKeyword("Màn hình"));
-        btnTabKeyboard.setOnClickListener(v -> openSearchWithKeyword("Bàn phím"));
-        btnTabMouse.setOnClickListener(v -> openSearchWithKeyword("Chuột"));
+        setupCategoryTab(btnTabPc,        R.id.imgTabPc,        "PC");
+        setupCategoryTab(btnTabLaptop,    R.id.imgTabLaptop,    "Laptop");
+        setupCategoryTab(btnTabHeadphone, R.id.imgTabHeadphone, "Tai nghe");
+        setupCategoryTab(btnTabMonitor,   R.id.imgTabMonitor,   "Màn hình");
+        setupCategoryTab(btnTabKeyboard,  R.id.imgTabKeyboard,  "Bàn phím");
+        setupCategoryTab(btnTabMouse,     R.id.imgTabMouse,     "Chuột");
     }
 
     private void openSearchWithKeyword(String keyword) {
@@ -244,33 +256,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /** Bottom nav */
-    private void setupBottomNavActions() {
-        btnHome.setOnClickListener(v -> {
-            // có thể cuộn về đầu nếu muốn
-            // ((ScrollView)findViewById(R.id.scrollView)).smoothScrollTo(0,0);
-        });
 
-        btnCategory.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, CategoryActivity.class);
-            startActivity(intent);
-        });
-
-        btnConsult.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, ConsultActivity.class);
-            startActivity(intent);
-        });
-
-        btnCart.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, CartActivity.class);
-            startActivity(intent);
-        });
-
-        btnUser.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-            startActivity(intent);
-        });
-    }
 
     /** Gọi API chia section như cũ */
     private void loadProducts() {

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.CategoryAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Category;
+import  com.example.baitap01_nhom6_ui_login_register_forgetpass.util.BottomNavHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,5 +49,6 @@ public class CategoryActivity extends AppCompatActivity {
 
         adapter = new CategoryAdapter(this, categoryList);
         recyclerCategories.setAdapter(adapter);
+        BottomNavHelper.setup(this, "CATEGORY");
     }
 }

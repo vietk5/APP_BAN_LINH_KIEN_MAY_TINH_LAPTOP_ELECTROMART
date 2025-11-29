@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/orderSuccessRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9FAFB">
+
+    <!-- Header dùng lại -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:id="@+id/contentCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@android:color/white"
+        android:elevation="4dp">
+
+        <!-- Icon thành công -->
+        <ImageView
+            android:id="@+id/imgSuccess"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_tick"
+            app:tint="#4CAF50" />
+
+        <TextView
+            android:id="@+id/tvThankYou"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Chúc mừng! Bạn đã đặt hàng thành công"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#111827"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvOrderInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Chúng tôi sẽ liên hệ và giao hàng sớm nhất có thể."
+            android:textSize="14sp"
+            android:textColor="#6B7280"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvTotalLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Tổng tiền thanh toán"
+            android:textSize="14sp"
+            android:textColor="#6B7280"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvTotalPaid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="0 đ"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#EF4444"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- 2 nút ở dưới -->
+    <LinearLayout
+        android:id="@+id/bottomButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnBackHome"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="Về trang chủ"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2563EB"
+            android:layout_marginStart="8dp"
+            android:padding="8dp" />
+        <Button
+            android:id="@+id/btnViewOrders"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:text="Xem đơn hàng"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2563EB"
+            android:layout_marginStart="8dp"
+            android:padding="8dp" />
+    </LinearLayout>
+
+</RelativeLayout>

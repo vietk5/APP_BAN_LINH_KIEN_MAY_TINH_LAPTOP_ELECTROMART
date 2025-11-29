@@ -21,16 +21,19 @@
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless">
         <ImageView
+            android:id="@+id/iconHome"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_home"
-            app:tint="#3B82F6"/>
+            app:tint="#A1A1A1"/>
+
         <TextView
+            android:id="@+id/labelHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Trang chủ"
             android:textSize="10sp"
-            android:textColor="#3B82F6"
+            android:textColor="#A1A1A1"
             android:gravity="center"/>
     </LinearLayout>
 
@@ -46,11 +49,14 @@
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless">
         <ImageView
+            android:id="@+id/iconCategory"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_category"
             app:tint="#A1A1A1"/>
+
         <TextView
+            android:id="@+id/labelCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Danh mục"
@@ -68,11 +74,13 @@
         android:orientation="vertical"
         android:gravity="center">
         <ImageView
+            android:id="@+id/iconConsult"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_handshake"
             app:tint="#0A1EDC"/>
         <TextView
+            android:id="@+id/labelConsult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tư vấn"
@@ -93,11 +101,14 @@
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless">
         <ImageView
+            android:id="@+id/iconCart"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_cart"
             app:tint="#A1A1A1"/>
+
         <TextView
+            android:id="@+id/labelCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Giỏ hàng"
@@ -118,11 +129,14 @@
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless">
         <ImageView
+            android:id="@+id/iconUser"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_user"
             app:tint="#A1A1A1"/>
+
         <TextView
+            android:id="@+id/labelUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cá nhân"

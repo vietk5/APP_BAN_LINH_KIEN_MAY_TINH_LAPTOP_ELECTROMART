@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -35,6 +37,8 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
     private EditText edtSearch;
     private TabLayout tabLayout;
     private RecyclerView rcvOrders;
+    private TextView tvEmptyOrders;
+
 
     private MyOrdersAdapter adapter;
     private List<Order> orderList = new ArrayList<>();
@@ -70,6 +74,8 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         edtSearch = findViewById(R.id.edtSearch);
         tabLayout = findViewById(R.id.tabLayout);
         rcvOrders = findViewById(R.id.rcvOrders);
+        tvEmptyOrders = findViewById(R.id.tvEmptyOrders);
+
     }
 
     private void setupRecyclerView() {
@@ -127,34 +133,48 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
     }
 
     private void loadOrdersFromApi(long userId) {
-        ApiClient.get().getOrdersByUserId(userId).enqueue(new retrofit2.Callback<OrderDetailDto>() {
-            @Override
-            public void onResponse(Call<OrderDetailDto> call, retrofit2.Response<OrderDetailDto> response) {
-                Log.d("DEBUG_ORDER", "code=" + response.code());
-                Log.d("DEBUG_ORDER", "isSuccessful=" + response.isSuccessful());
-                Log.d("DEBUG_ORDER", "body=" + response.body());
+        ApiClient.get().getOrdersByUserId(userId)
+                .enqueue(new retrofit2.Callback<List<OrderDetailDto>>() {
+                    @Override
+                    public void onResponse(Call<List<OrderDetailDto>> call,
+                                           retrofit2.Response<List<OrderDetailDto>> response) {
 
-                if (response.isSuccessful() && response.body() != null) {
-                    orderList.clear();
-                    Order order = mapDtoToOrder(response.body());
-                    if (order != null) {
-                        orderList.add(order);
-                        Log.d("DEBUG_ORDER", "Added order: " + order.getOrderId());
+                        Log.d("DEBUG_ORDER", "code=" + response.code());
+                        Log.d("DEBUG_ORDER", "isSuccessful=" + response.isSuccessful());
+                        Log.d("DEBUG_ORDER", "body=" + response.body());
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            orderList.clear();
+
+                            List<OrderDetailDto> dtoList = response.body();
+                            Log.d("DEBUG_ORDER", "dtoList size=" + dtoList.size());
+
+                            for (OrderDetailDto dto : dtoList) {
+                                Order order = mapDtoToOrder(dto);
+                                if (order != null) {
+                                    orderList.add(order);
+                                    Log.d("DEBUG_ORDER", "Added order: " + order.getOrderId());
+                                }
+                            }
+
+                            filterOrders();
+                        } else {
+                            Log.e("DEBUG_ORDER", "Response failed, code=" + response.code());
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Không lấy được đơn hàng",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    filterOrders();
-                } else {
-                    Log.e("DEBUG_ORDER", "Response failed");
-                    Toast.makeText(MyOrdersActivity.this, "Không lấy được đơn hàng", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<OrderDetailDto> call, Throwable t) {
-                Log.e("DEBUG_ORDER", "API call failed: " + t.getMessage());
-                t.printStackTrace();
-                Toast.makeText(MyOrdersActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<List<OrderDetailDto>> call, Throwable t) {
+                        Log.e("DEBUG_ORDER", "API call failed: " + t.getMessage());
+                        t.printStackTrace();
+                        Toast.makeText(MyOrdersActivity.this,
+                                "Lỗi kết nối: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void filterOrders() {
@@ -186,6 +206,14 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
 
         Log.d("DEBUG_FILTER", "filteredList final size=" + filteredList.size());
         adapter.updateData(filteredList);
+        if (filteredList.isEmpty()) {
+            tvEmptyOrders.setVisibility(View.VISIBLE);
+            rcvOrders.setVisibility(View.GONE);
+        } else {
+            tvEmptyOrders.setVisibility(View.GONE);
+            rcvOrders.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override

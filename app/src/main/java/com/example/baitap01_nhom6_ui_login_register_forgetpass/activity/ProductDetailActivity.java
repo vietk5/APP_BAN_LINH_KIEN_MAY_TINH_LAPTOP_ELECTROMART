@@ -26,10 +26,12 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.CommentA
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.ProductAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutItem;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.singleton.CartManager;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.PriceFormatter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
@@ -56,8 +58,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private EditText edtComment;
     private Button btnSendComment, btnBuyNow, btnAddToCart;
     private RatingBar ratingBar;
-    private TextView txtRatingAvg;    // thêm biến
-    private LinearLayout ratingBars;  // nếu muốn vẽ biểu đồ
+    private TextView txtRatingAvg;
+    private LinearLayout ratingBars;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         productId = getIntent().getLongExtra("product_id", -1);
 
         initViews();
+
         // ⭐ KHÔI PHỤC COMMENT VÀ RATING SAU KHI LOGIN QUAY LẠI
         String draft = getIntent().getStringExtra("commentDraft");
         int draftRating = getIntent().getIntExtra("ratingDraft", 0);
@@ -86,10 +89,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         if (draftRating > 0) {
             ratingBar.setRating(draftRating);
         }
+
         loadProductDetail();
         loadRelatedProducts();
         loadComments();
         loadRatingSummary();
+
         btnSendComment.setOnClickListener(v -> sendComment());
         btnBuyNow.setOnClickListener(v -> handleBuyNow());
         btnAddToCart.setOnClickListener(v -> handleAddToCart());
@@ -116,32 +121,122 @@ public class ProductDetailActivity extends AppCompatActivity {
         txtRatingAvg = findViewById(R.id.txtRatingAvg);
         ratingBars   = findViewById(R.id.ratingBars);
     }
+
+    // ================== BUY NOW ==================
     private void handleBuyNow() {
-        if (pref.isLoggedIn()) {
-            if (currentProduct != null) {
-                CartManager.getInstance().addProduct(currentProduct);
-            }
-            Intent intent = new Intent(this, CartActivity.class);
-            startActivity(intent);
-        } else {
+        if (!pref.isLoggedIn()) {
             showLoginDialog();
+            return;
         }
+
+        if (currentProduct == null) {
+            Toast.makeText(this, "Không thể mua sản phẩm này", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int userId = pref.getUserId();
+        if (userId <= 0) {
+            Toast.makeText(this, "Lỗi tài khoản, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Chuẩn bị CheckoutItem cho sản phẩm hiện tại
+        long priceLong = 0L;
+        try {
+            priceLong = Long.parseLong(currentProduct.getPrice());
+        } catch (NumberFormatException e) {
+            // nếu lỗi parse thì để 0
+        }
+
+        ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
+        checkoutItems.add(
+                new CheckoutItem(
+                        currentProduct.getId(),
+                        currentProduct.getName(),
+                        currentProduct.getImageUrl(),
+                        priceLong,
+                        1   // số lượng mặc định
+                )
+        );
+
+        // Vẫn add vào giỏ để lưu DB
+        CartRequest req = new CartRequest(userId, currentProduct.getId(), 1);
+
+        api.addToCart(req).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> res) {
+                if (res.isSuccessful()) {
+
+                    // cache local nếu muốn
+                    CartManager.getInstance().addProduct(currentProduct);
+
+                    // ➜ Mở màn hình checkout với list "items"
+                    Intent intent = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
+                    intent.putExtra("items", checkoutItems);
+                    startActivity(intent);
+
+                } else {
+                    Toast.makeText(ProductDetailActivity.this,
+                            "Không thể thêm vào giỏ (mã lỗi " + res.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProductDetailActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    // ================== ADD TO CART ==================
     private void handleAddToCart() {
-        if (pref.isLoggedIn()) {
-            if (currentProduct != null) {
-                CartManager.getInstance().addProduct(currentProduct);
-                Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Không thể thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-            }
-        } else {
+        if (!pref.isLoggedIn()) {
             showLoginDialog();
+            return;
         }
+
+        if (currentProduct == null) {
+            Toast.makeText(this, "Không thể thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int userId = pref.getUserId();
+        if (userId <= 0) {
+            Toast.makeText(this, "Lỗi tài khoản, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        CartRequest req = new CartRequest(userId, currentProduct.getId(), 1);
+
+        api.addToCart(req).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> res) {
+                if (res.isSuccessful()) {
+                    CartManager.getInstance().addProduct(currentProduct);
+
+                    Toast.makeText(ProductDetailActivity.this,
+                            "Đã thêm vào giỏ hàng",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ProductDetailActivity.this,
+                            "Không thể thêm vào giỏ (mã lỗi " + res.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProductDetailActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-
+    // ================== LOAD DATA ==================
     private void loadProductDetail() {
         api.getProductById(productId).enqueue(new Callback<ProductDto>() {
             @Override
@@ -149,7 +244,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                 if (!res.isSuccessful() || res.body() == null) return;
 
                 ProductDto p = res.body();
-                currentProduct = new Product(p.getId(), p.getName(), String.valueOf(p.getPrice()), p.getImageUrl());
+
+                currentProduct = new Product(
+                        p.getId(),
+                        p.getName(),
+                        String.valueOf(p.getPrice()),
+                        p.getImageUrl()
+                );
+
                 txtName.setText(p.getName());
                 txtPrice.setText(PriceFormatter.vnd(p.getPrice()));
                 txtDesc.setText("Hàng mới 100%, bảo hành 24 tháng");
@@ -173,25 +275,27 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                 List<Product> list = new ArrayList<>();
                 for (ProductDto dto : res.body()) {
-                    list.add(new Product(dto.getId(),
+                    list.add(new Product(
+                            dto.getId(),
                             dto.getName(),
                             PriceFormatter.vnd(dto.getPrice()),
-                            dto.getImageUrl()));
+                            dto.getImageUrl()
+                    ));
                 }
 
                 rvRelated.setAdapter(new ProductAdapter(list));
             }
 
-            @Override public void onFailure(Call<List<ProductDto>> call, Throwable t) {}
+            @Override
+            public void onFailure(Call<List<ProductDto>> call, Throwable t) {}
         });
     }
-
 
     private void loadComments() {
         api.getComments(productId).enqueue(new Callback<List<Comment>>() {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> res) {
-                if(res.isSuccessful() && res.body() != null){
+                if (res.isSuccessful() && res.body() != null) {
                     commentList.clear();
                     commentList.addAll(res.body());
                     rvComments.setAdapter(new CommentAdapter(commentList));
@@ -203,47 +307,41 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
     }
 
-
-    private void sendComment(){
-
-        // 1. yêu cầu đăng nhập
-        if(!pref.isLoggedIn()){
+    // ================== COMMENT & RATING ==================
+    private void sendComment() {
+        if (!pref.isLoggedIn()) {
             showLoginDialog();
             return;
         }
 
-        // 2. kiểm tra nội dung comment
         String content = edtComment.getText().toString().trim();
-        if(content.isEmpty()){
+        if (content.isEmpty()) {
             edtComment.setError("Bạn chưa nhập bình luận");
             return;
         }
 
-        // 3. kiểm tra số sao
         int rating = (int) ratingBar.getRating();
-        if(rating == 0){
+        if (rating == 0) {
             Toast.makeText(this, "Vui lòng đánh giá số sao", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 4. tạo comment
         Comment c = new Comment(
                 productId,
-                pref.getName(), // tên user đã lưu
+                pref.getName(),
                 content,
                 rating
         );
 
-        // 5. gửi API
         api.postComment(c).enqueue(new Callback<Comment>() {
             @Override
             public void onResponse(Call<Comment> call, Response<Comment> res) {
-                if(res.isSuccessful()){
-
+                if (res.isSuccessful()) {
                     edtComment.setText("");
                     ratingBar.setRating(0);
                     loadComments();
-                    Toast.makeText(ProductDetailActivity.this, "Đã gửi bình luận", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductDetailActivity.this,
+                            "Đã gửi bình luận", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -251,7 +349,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             public void onFailure(Call<Comment> call, Throwable t) {}
         });
     }
-
 
     private void showLoginDialog() {
         new AlertDialog.Builder(this)
@@ -263,14 +360,12 @@ public class ProductDetailActivity extends AppCompatActivity {
                     i.putExtra("productId", productId);
                     i.putExtra("commentDraft", edtComment.getText().toString());
                     i.putExtra("ratingDraft", (int) ratingBar.getRating());
-
                     startActivity(i);
-
-
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
     }
+
     private void loadRatingSummary() {
         api.getRatingSummary(productId).enqueue(new Callback<RatingSummary>() {
             @Override
@@ -313,6 +408,4 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         ratingBars.addView(row);
     }
-
-
 }

@@ -15,6 +15,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDt
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.BottomNavHelper;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -47,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
         initViews();
         loadUserInfoFromApi();
         setupClickListeners();
+        BottomNavHelper.setup(this, "PROFILE");
     }
 
     private void initViews() {

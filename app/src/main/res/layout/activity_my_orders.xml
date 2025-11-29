@@ -125,11 +125,24 @@
 
     </com.google.android.material.tabs.TabLayout>
 
+    <!-- TextView hiển thị khi không có đơn hàng -->
+    <TextView
+        android:id="@+id/tvEmptyOrders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hiện tại chưa có đơn hàng nào"
+        android:textSize="16sp"
+        android:textColor="#757575"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone" />
+
     <!-- RecyclerView danh sách đơn hàng -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvOrders"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingVertical="8dp"
         android:clipToPadding="false" />
 

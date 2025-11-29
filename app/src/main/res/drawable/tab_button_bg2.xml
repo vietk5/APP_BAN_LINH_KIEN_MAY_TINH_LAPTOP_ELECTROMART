@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Trạng thái đang nhấn -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#1D4ED8" /> <!-- xanh đậm hơn khi nhấn -->
+            <corners android:radius="16dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#93C5FD" />
+            <padding
+                android:left="4dp"
+                android:top="4dp"
+                android:right="4dp"
+                android:bottom="4dp" />
+        </shape>
+    </item>
+
+    <!-- Trạng thái được chọn (nếu sau này setSelected(true)) -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#2563EB" /> <!-- xanh primary -->
+            <corners android:radius="16dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#BFDBFE" />
+            <padding
+                android:left="4dp"
+                android:top="4dp"
+                android:right="4dp"
+                android:bottom="4dp" />
+        </shape>
+    </item>
+
+    <!-- Trạng thái bình thường -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#3B82F6" /> <!-- xanh tươi hơn -->
+            <corners android:radius="16dp" />
+            <stroke
+                android:width="1dp"
+                android:color="#DBEAFE" />
+            <padding
+                android:left="4dp"
+                android:top="4dp"
+                android:right="4dp"
+                android:bottom="4dp" />
+        </shape>
+    </item>
+
+</selector>
