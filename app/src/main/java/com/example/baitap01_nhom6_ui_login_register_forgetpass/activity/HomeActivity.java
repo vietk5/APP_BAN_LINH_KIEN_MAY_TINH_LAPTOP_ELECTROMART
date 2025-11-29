@@ -217,10 +217,6 @@ public class HomeActivity extends AppCompatActivity {
     /** Tìm kiếm bằng từ khóa nhập */
     private void doSearch() {
         String keyword = edtSearch.getText().toString().trim();
-        if (keyword.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập từ khóa tìm kiếm", Toast.LENGTH_SHORT).show();
-            return;
-        }
         openSearchWithKeyword(keyword);
     }
 

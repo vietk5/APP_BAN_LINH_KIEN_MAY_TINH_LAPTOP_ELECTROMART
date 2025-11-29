@@ -7,7 +7,7 @@
     android:background="#F9FAFB"
     tools:context=".activity.CategoryActivity">
 
-    <!-- 1️⃣ HEADER -->
+    <!-- HEADER -->
     <include
         android:id="@+id/header"
         layout="@layout/header_layout"
@@ -15,33 +15,70 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true" />
 
-    <!-- 2️⃣ TIÊU ĐỀ -->
-    <TextView
-        android:id="@+id/tv_category_title"
+    <!-- CONTENT: dưới header, trên bottom-nav -->
+    <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/header"
-        android:text="Danh mục sản phẩm"
-        android:textColor="#111827"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:padding="16dp" />
-
-    <!-- 3️⃣ DANH SÁCH DANH MỤC -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_categories"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/tv_category_title"
         android:layout_above="@id/footer"
-        android:padding="12dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
-        tools:listitem="@layout/item_category" />
+        android:orientation="vertical">
 
-    <!-- 4️⃣ FOOTER -->
+        <!-- Tiêu đề -->
+        <TextView
+            android:id="@+id/tv_category_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh mục sản phẩm"
+            android:textColor="#111827"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp" />
+
+        <!-- Grid danh mục -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="8dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"
+            tools:listitem="@layout/item_category" />
+
+        <!-- Tiêu đề sản phẩm -->
+        <TextView
+            android:id="@+id/tv_product_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tất cả sản phẩm"
+            android:textColor="#111827"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+        <!-- Grid sản phẩm -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_products"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:overScrollMode="always"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/item_product" />
+
+    </LinearLayout>
+
+    <!-- FOOTER (bottom nav) -->
     <include
         android:id="@+id/footer"
         layout="@layout/bottom_navigation"

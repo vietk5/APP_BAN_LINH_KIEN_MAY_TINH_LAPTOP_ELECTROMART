@@ -178,4 +178,10 @@ public interface ApiService {
     @POST("api/cart/checkout")
     Call<Void> checkout(@Body CheckoutRequest request);
 
+    @DELETE("api/cart/{userId}/item/{productId}")
+    Call<Void> deleteCartItem(@Path("userId") int userId,
+                              @Path("productId") long productId);
+
+
+
 }

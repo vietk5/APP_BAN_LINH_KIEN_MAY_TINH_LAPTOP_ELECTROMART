@@ -11,6 +11,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -79,7 +82,11 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         );
 
         setContentView(R.layout.activity_cart);
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header), (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
         initViews();
         initSession();
         loadCartDataLocal();    // dữ liệu local từ CartManager
@@ -110,9 +117,10 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
 
     private void setupRecyclerView() {
         recyclerCart.setLayoutManager(new LinearLayoutManager(this));
-        cartAdapter = new CartAdapter(cartItems, this);
+        cartAdapter = new CartAdapter(this, cartItems, this, userId);
         recyclerCart.setAdapter(cartAdapter);
     }
+
 
     private void setupEvents() {
         // Chọn / bỏ chọn tất cả
