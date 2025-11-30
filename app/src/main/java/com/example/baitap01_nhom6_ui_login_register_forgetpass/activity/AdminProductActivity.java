@@ -10,7 +10,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,6 +28,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.AdminNavHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,18 +46,33 @@ public class AdminProductActivity extends AppCompatActivity
     private MaterialButton btnAddProduct;
     private RecyclerView recyclerView;
     private Spinner spnSort;
+
+    // sort: null / "asc" / "desc"
     private String currentSort = null;
 
+    // danh sách đầy đủ lấy từ API
+    private final List<AdminProductDto> allProducts = new ArrayList<>();
 
+    // danh sách sau khi lọc + sort để show RecyclerView
     private final List<AdminProductDto> data = new ArrayList<>();
     private AdminProductAdapter adapter;
+
+    // loading & thống kê
+    private ProgressBar progressLoading;
+    private TextView tvTotalProducts, tvInStockProducts, tvOutStockProducts;
+    private MaterialCardView cardAllProducts, cardInStock, cardOutStock;
+
+    // filter theo trạng thái kho: ALL / IN / OUT
+    private String currentStatusFilter = "ALL";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_product);
+
         MaterialToolbar toolbar = findViewById(R.id.adminToolbar);
         AdminNavHelper.setupToolbar(this, toolbar, "Admin - Quản lí sản phẩm");
+
         initViews();
         setupRecyclerView();
         setupEvents();
@@ -69,6 +87,14 @@ public class AdminProductActivity extends AppCompatActivity
         btnAddProduct  = findViewById(R.id.btnAddProduct);
         recyclerView   = findViewById(R.id.recyclerProductsAdmin);
         spnSort        = findViewById(R.id.spnSort);
+
+        progressLoading     = findViewById(R.id.progressLoading);
+        tvTotalProducts     = findViewById(R.id.tvTotalProducts);
+        tvInStockProducts   = findViewById(R.id.tvInStockProducts);
+        tvOutStockProducts  = findViewById(R.id.tvOutStockProducts);
+        cardAllProducts     = findViewById(R.id.cardAllProducts);
+        cardInStock         = findViewById(R.id.cardInStock);
+        cardOutStock        = findViewById(R.id.cardOutStock);
     }
 
     private void setupRecyclerView() {
@@ -100,6 +126,7 @@ public class AdminProductActivity extends AppCompatActivity
                 loadProducts(keyword.isEmpty() ? null : keyword);
             }
         });
+
         // ================= SORT ==================
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item,
@@ -120,50 +147,148 @@ public class AdminProductActivity extends AppCompatActivity
                     default:
                         currentSort = null;
                 }
-
-                // load lại danh sách khi chọn sort
-                loadProducts(edtSearch.getText().toString().trim());
+                // chỉ cần sort lại trên list hiện có, không cần gọi API
+                applyFilterAndSort();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        // ===== FILTER THEO TRẠNG THÁI KHO =====
+        cardAllProducts.setOnClickListener(v -> setStatusFilter("ALL"));
+        cardInStock.setOnClickListener(v -> setStatusFilter("IN"));
+        cardOutStock.setOnClickListener(v -> setStatusFilter("OUT"));
+
+        // chọn mặc định là ALL
+        setStatusFilter("ALL");
     }
 
     // ===== LOGIC GỌI API LẤY DANH SÁCH =====
     private void loadProducts(String keyword) {
+        // Hiện loading
+        if (progressLoading != null) {
+            progressLoading.setVisibility(View.VISIBLE);
+        }
+
         ApiClient.get().getAdminProducts(null, null, keyword)
                 .enqueue(new Callback<List<AdminProductDto>>() {
                     @Override
                     public void onResponse(Call<List<AdminProductDto>> call,
                                            Response<List<AdminProductDto>> response) {
+
+                        // Tắt loading
+                        if (progressLoading != null) {
+                            progressLoading.setVisibility(View.GONE);
+                        }
+
                         if (!response.isSuccessful() || response.body() == null) {
-                            // Có thể thông báo lỗi nhẹ hoặc để trống
+                            Toast.makeText(AdminProductActivity.this,
+                                    "Không lấy được danh sách sản phẩm", Toast.LENGTH_SHORT).show();
+                            allProducts.clear();
+                            updateSummaryCounts();
+                            applyFilterAndSort();
                             return;
                         }
 
-//                        data.clear();
-//                        data.addAll(response.body());
-                        data.clear();
-                        List<AdminProductDto> list = response.body();
+                        allProducts.clear();
+                        allProducts.addAll(response.body());
 
-                        if (currentSort != null && list != null) {
-                            if (currentSort.equals("asc")) {
-                                list.sort(Comparator.comparingInt(p -> p.tonKho));
-                            } else if (currentSort.equals("desc")) {
-                                list.sort((a, b) -> b.tonKho - a.tonKho);
-                            }
-                        }
-
-                        data.addAll(list);
-                        adapter.notifyDataSetChanged();
-                        adapter.notifyDataSetChanged();
+                        updateSummaryCounts();
+                        applyFilterAndSort();
                     }
 
                     @Override
                     public void onFailure(Call<List<AdminProductDto>> call, Throwable t) {
+                        // Tắt loading
+                        if (progressLoading != null) {
+                            progressLoading.setVisibility(View.GONE);
+                        }
+
                         Toast.makeText(AdminProductActivity.this,
                                 "Lỗi kết nối server", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    // Cập nhật 3 ô thống kê: tổng / còn / hết (<2)
+    private void updateSummaryCounts() {
+        int total = allProducts.size();
+        int inStock = 0;
+        int outStock = 0;
+
+        for (AdminProductDto p : allProducts) {
+            int stock = p.tonKho;
+            if (stock >= 2) {
+                inStock++;
+            } else {
+                outStock++;
+            }
+        }
+
+        tvTotalProducts.setText(String.valueOf(total));
+        tvInStockProducts.setText(String.valueOf(inStock));
+        tvOutStockProducts.setText(String.valueOf(outStock));
+    }
+
+    // Lọc theo trạng thái kho + sort + đổ vào RecyclerView
+    private void applyFilterAndSort() {
+        List<AdminProductDto> filtered = new ArrayList<>();
+
+        for (AdminProductDto p : allProducts) {
+            int stock = p.tonKho;
+            boolean match;
+
+            switch (currentStatusFilter) {
+                case "IN":
+                    match = stock >= 2;
+                    break;
+                case "OUT":
+                    match = stock < 2;
+                    break;
+                default:
+                    match = true; // ALL
+            }
+
+            if (match) {
+                filtered.add(p);
+            }
+        }
+
+        // sort theo tồn kho nếu có chọn
+        if (currentSort != null) {
+            if ("asc".equals(currentSort)) {
+                filtered.sort(Comparator.comparingInt(a -> a.tonKho));
+            } else if ("desc".equals(currentSort)) {
+                filtered.sort((a, b) -> b.tonKho - a.tonKho);
+            }
+        }
+
+        data.clear();
+        data.addAll(filtered);
+        adapter.notifyDataSetChanged();
+    }
+
+    // Đổi filter ALL / IN / OUT + highlight card
+    private void setStatusFilter(String status) {
+        currentStatusFilter = status;
+
+        // reset strokeWidth
+        cardAllProducts.setStrokeWidth(0);
+        cardInStock.setStrokeWidth(0);
+        cardOutStock.setStrokeWidth(0);
+
+        switch (status) {
+            case "IN":
+                cardInStock.setStrokeWidth(4);
+                break;
+            case "OUT":
+                cardOutStock.setStrokeWidth(4);
+                break;
+            default:
+                cardAllProducts.setStrokeWidth(4);
+                break;
+        }
+
+        applyFilterAndSort();
     }
 
     // ===== IMPLEMENT CALLBACK TỪ ADAPTER =====
@@ -262,11 +387,10 @@ public class AdminProductActivity extends AppCompatActivity
     }
 
     // Lưu ý: Khi quay lại từ ProductEntryActivity (sau khi thêm mới thành công),
-    // bạn có thể muốn load lại list. Sử dụng onResume để làm việc đó.
+    // load lại list để cập nhật
     @Override
     protected void onResume() {
         super.onResume();
-        // Load lại danh sách mỗi khi màn hình này hiện lên (để cập nhật sp mới thêm)
         loadProducts(edtSearch.getText().toString().trim());
     }
 }

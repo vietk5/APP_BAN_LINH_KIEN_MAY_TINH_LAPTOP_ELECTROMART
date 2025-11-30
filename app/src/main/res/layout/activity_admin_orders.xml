@@ -1,49 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/adminBackground"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/adminBackground">
 
     <!-- HEADER CHUNG -->
     <include
-        layout="@layout/layout_admin_header" />
+        android:id="@+id/includeHeader"
+        layout="@layout/layout_admin_header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Bộ lọc -->
+    <!-- BỘ LỌC TRẠNG THÁI + SẮP XẾP -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/filterContainer"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/includeHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Spinner
             android:id="@+id/spStatus"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_spinner"
-            android:textColor="@color/border_light"/>
+            android:background="@drawable/bg_spinner" />
 
-        <Space android:layout_width="12dp" android:layout_height="match_parent"/>
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="match_parent"/>
 
         <Spinner
             android:id="@+id/spSort"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_spinner"
-            android:textColor="@color/border_light" />
+            android:background="@drawable/bg_spinner" />
     </LinearLayout>
 
-    <!-- Danh sách đơn -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerAdminOrders"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp" />
+    <!-- TEXT ĐẾM SỐ ĐƠN THEO TRẠNG THÁI -->
+    <TextView
+        android:id="@+id/tvStatusCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="4dp"
+        android:text="Tổng: 0 đơn"
+        android:textSize="13sp"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/filterContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-</LinearLayout>
+    <!-- DANH SÁCH ĐƠN + LOADING OVERLAY -->
+    <FrameLayout
+        android:id="@+id/listContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tvStatusCount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="8dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerAdminOrders"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp" />
+
+        <ProgressBar
+            android:id="@+id/progressLoading"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

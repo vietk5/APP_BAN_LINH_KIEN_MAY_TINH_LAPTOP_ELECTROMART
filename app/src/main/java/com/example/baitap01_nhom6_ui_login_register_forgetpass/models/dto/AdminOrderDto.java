@@ -5,7 +5,8 @@ public class AdminOrderDto {
     public String customerName;
     public long totalAmount;
     public String status;
+    public String customerPhone;
+    public String customerAddress;
     public String createdAt;
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
 }

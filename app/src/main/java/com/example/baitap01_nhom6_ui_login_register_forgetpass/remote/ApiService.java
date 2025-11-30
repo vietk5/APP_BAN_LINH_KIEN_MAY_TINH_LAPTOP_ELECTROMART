@@ -6,6 +6,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.BrandD
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ChangePasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ForgotPasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailItemDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.PageResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
@@ -83,7 +84,11 @@ public interface ApiService {
     );
     @PATCH("/api/admin/orders/{id}/status")
     Call<Void> updateOrderStatus(@Path("id") long id,
-                                 @Query("value") String value);
+                                 @Query("status") String status);
+    // ApiService.java
+    @GET("/api/admin/orders/{id}/items")
+    Call<List<OrderDetailItemDto>> getAdminOrderItems(@Path("id") long orderId);
+
 
     // ======== ADMIN CUSTOMERS =========
     @GET("/api/admin/customers")

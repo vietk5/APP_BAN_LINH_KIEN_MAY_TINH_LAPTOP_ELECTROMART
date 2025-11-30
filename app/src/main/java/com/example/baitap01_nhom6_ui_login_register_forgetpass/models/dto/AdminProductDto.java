@@ -8,7 +8,7 @@ public class AdminProductDto {
     public String loaiTen;
     public String thuongHieuTen;
     public String imageUrl;
-    public String moTa;
+    public String moTaNgan;
     public  Long loaiId;
     public Long thuongHieuId;
 }

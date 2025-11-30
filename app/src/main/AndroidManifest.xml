@@ -73,7 +73,7 @@
             android:name=".activity.EmptyCartActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AdminActivity"
+            android:name=".activity.FirstPage"
             android:exported="false" />
         <activity
             android:name=".activity.OrderConfirmationActivity"
@@ -94,7 +94,7 @@
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.FirstPage"
+            android:name=".activity.AdminActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
