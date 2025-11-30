@@ -1,9 +1,13 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -139,16 +143,32 @@ public class HomeActivity extends AppCompatActivity {
         btnTabMouse     = findViewById(R.id.btnTabMouse);
         bannerViewPager = findViewById(R.id.bannerViewPager);
     }
-
-    /** Dòng chào mừng: nếu đã login thì hiện tên khách hàng */
+    /** Dòng chào mừng: nếu đã login thì hiện tên khách hàng (tên in đậm) */
     private void updateWelcomeMessage() {
         if (sharedPrefManager != null && sharedPrefManager.isLoggedIn()) {
             String customerName = sharedPrefManager.getName();
             if (customerName != null && !customerName.trim().isEmpty()) {
-                tvWelcomeMessage.setText("Chào mừng bạn " + customerName + " đến với ElectroMart");
+
+                String prefix = "Chào mừng bạn ";
+                String suffix = " đến với ElectroMart";
+                String full    = prefix + customerName + suffix;
+
+                // Dùng Spannable để in đậm phần tên
+                SpannableStringBuilder ssb = new SpannableStringBuilder(full);
+                int start = prefix.length();
+                int end   = start + customerName.length();
+                ssb.setSpan(
+                        new StyleSpan(Typeface.BOLD),
+                        start,
+                        end,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+
+                tvWelcomeMessage.setText(ssb);
                 return;
             }
         }
+
         // mặc định khi chưa login / không có tên
         tvWelcomeMessage.setText("Chào mừng bạn đến với ElectroMart");
     }
