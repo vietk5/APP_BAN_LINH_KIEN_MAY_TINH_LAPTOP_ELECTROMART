@@ -16,7 +16,9 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiRes
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ChangePasswordRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.AdminNavHelper;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,6 +49,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
             finish();
             return;
         }
+        MaterialToolbar toolbar = findViewById(R.id.userToolbar);
+        AdminNavHelper.setupToolbar(this, toolbar, "Thay đổi mật khẩu");
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         initViews();
     }

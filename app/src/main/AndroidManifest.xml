@@ -34,7 +34,7 @@
             android:name=".activity.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name=".activity.AdminActivity"
             android:exported="false" />
         <activity
             android:name=".activity.MyOrdersActivity"
@@ -94,7 +94,7 @@
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AdminActivity"
+            android:name=".activity.ProfileActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
