@@ -187,6 +187,7 @@ public interface ApiService {
     Call<Void> deleteCartItem(@Path("userId") int userId,
                               @Path("productId") long productId);
 
-
+    @GET("/api/admin/products")
+    Call<List<AdminProductDto>> getAllProducts();
 
 }

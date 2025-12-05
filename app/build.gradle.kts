@@ -51,4 +51,9 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
+    implementation("com.google.guava:guava:31.0.1-android")
+    implementation("org.reactivestreams:reactive-streams:1.0.4")
+//    implementation("com.google.ai:client-android:0.7.0")
 }

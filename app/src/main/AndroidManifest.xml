@@ -16,6 +16,9 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.AdminActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.OrderSuccessActivity"
             android:exported="false" />
         <activity
@@ -94,7 +97,7 @@
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AdminActivity"
+            android:name=".activity.ChatBotActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
