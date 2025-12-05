@@ -161,8 +161,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Địa chỉ đã lưu
         menuAddress.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show();
-            // Chuyển sang AddressActivity
+            Intent intent = new Intent(ProfileActivity.this, AddressListActivity.class);
+            startActivityForResult(intent, 100);
         });
 
         // Thay đổi mật khẩu

@@ -5,6 +5,11 @@
     <color name="text_gray">#888888</color>
     <color name="background_light">#FFFFFF</color>
     <color name="border_light">#E5E7EB</color>
+    <!-- New colors for address feature -->
+    <color name="blue_500">#3B82F6</color>
+    <color name="gray_300">#D1D5DB</color>
+    <color name="gray_600">#6B7280</color>
+    <color name="gray_900">#111827</color>
 
     <!-- Gradient for background -->
     <color name="gradient_start">#E0F2FE</color>

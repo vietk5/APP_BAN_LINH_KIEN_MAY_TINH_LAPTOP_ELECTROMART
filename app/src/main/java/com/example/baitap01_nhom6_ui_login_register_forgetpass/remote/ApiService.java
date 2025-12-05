@@ -26,6 +26,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Revenu
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartItemDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Address;
 
 
 import java.util.List;
@@ -189,5 +190,61 @@ public interface ApiService {
 
     @GET("/api/admin/products")
     Call<List<AdminProductDto>> getAllProducts();
+
+    // ==================== ADDRESS ENDPOINTS ====================
+
+    /**
+     * Lấy tất cả địa chỉ của user
+     */
+    @GET("api/addresses/user/{userId}")
+    Call<ApiResponse<List<Address>>> getAllAddresses(@Path("userId") Long userId);
+
+    /**
+     * Lấy chi tiết một địa chỉ
+     */
+    @GET("api/addresses/{id}")
+    Call<ApiResponse<Address>> getAddressById(
+            @Path("id") Long id,
+            @Query("userId") Long userId
+    );
+
+    /**
+     * Lấy địa chỉ mặc định
+     */
+    @GET("api/addresses/user/{userId}/default")
+    Call<ApiResponse<Address>> getDefaultAddress(@Path("userId") Long userId);
+
+    /**
+     * Tạo địa chỉ mới
+     */
+    @POST("api/addresses")
+    Call<ApiResponse<Address>> createAddress(@Body Address address);
+
+    /**
+     * Cập nhật địa chỉ
+     */
+    @PUT("api/addresses/{id}")
+    Call<ApiResponse<Address>> updateAddress(
+            @Path("id") Long id,
+            @Body Address address
+    );
+
+    /**
+     * Xóa địa chỉ
+     */
+    @DELETE("api/addresses/{id}")
+    Call<ApiResponse<Void>> deleteAddress(
+            @Path("id") Long id,
+            @Query("userId") Long userId
+    );
+
+    /**
+     * Đặt địa chỉ làm mặc định
+     */
+    @PUT("api/addresses/{id}/set-default")
+    Call<ApiResponse<Address>> setDefaultAddress(
+            @Path("id") Long id,
+            @Query("userId") Long userId
+    );
 
 }

@@ -97,6 +97,12 @@
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.AddEditAddressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AddressListActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ChatBotActivity"
             android:exported="true">
             <intent-filter>
