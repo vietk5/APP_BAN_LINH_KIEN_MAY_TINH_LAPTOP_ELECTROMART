@@ -17,15 +17,15 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Update
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.AdminNavHelper;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UpdateProfileActivity extends AppCompatActivity {
-
-    private ImageButton btnBack;
     private TextView tvEmail;
     private EditText etHoTen, etSoDienThoai;
     private LinearLayout btnUpdate;
@@ -39,6 +39,10 @@ public class UpdateProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
 
+        MaterialToolbar toolbar = findViewById(R.id.userToolbar);
+        AdminNavHelper.setupToolbar(this, toolbar, "Thông tin cá nhân");
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         sharedPref = new SharedPrefManager(this);
         apiService = ApiClient.get();
 
@@ -47,14 +51,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btn_back);
         tvEmail = findViewById(R.id.tv_email);
         etHoTen = findViewById(R.id.et_ho_ten);
         etSoDienThoai = findViewById(R.id.et_so_dien_thoai);
         btnUpdate = findViewById(R.id.btn_update);
         progressBar = findViewById(R.id.progress_bar);
-
-        btnBack.setOnClickListener(v -> finish());
         btnUpdate.setOnClickListener(v -> updateProfile());
     }
 
