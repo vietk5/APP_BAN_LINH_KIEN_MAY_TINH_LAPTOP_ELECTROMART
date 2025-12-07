@@ -63,9 +63,9 @@
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:background="@drawable/button_primary"
         android:text="Thêm địa chỉ mới"
         android:textColor="#FFFFFF"
+        android:backgroundTint="#3B82F6"
         android:textSize="16sp"
         android:textStyle="bold" />
 </RelativeLayout>
