@@ -206,7 +206,7 @@
                 app:iconPadding="0dp"
                 app:iconTint="#FFFFFF"
                 app:cornerRadius="24dp"
-                app:backgroundTint="#6200EA"
+                app:backgroundTint="#3B82F6"
                 android:contentDescription="Send Message" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
