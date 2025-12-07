@@ -76,7 +76,7 @@
             android:name=".activity.EmptyCartActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.FirstPage"
+            android:name=".activity.ChatBotActivity"
             android:exported="false" />
         <activity
             android:name=".activity.OrderConfirmationActivity"
@@ -103,7 +103,7 @@
             android:name=".activity.AddressListActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ChatBotActivity"
+            android:name=".activity.FirstPage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
