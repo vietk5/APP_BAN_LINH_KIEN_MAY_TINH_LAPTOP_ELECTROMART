@@ -65,7 +65,7 @@ public class ChatBotActivity extends AppCompatActivity {
 
         ImageButton backToHomeButton = findViewById(R.id.backToHomeButton);
         backToHomeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ChatBotActivity.this, HomeActivity.class);
+            Intent intent = new Intent(ChatBotActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         });
