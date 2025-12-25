@@ -26,6 +26,7 @@
     <color name="green_500">#4CAF50</color>
     <color name="red_500">#F44336</color>
     <color name="text_primary">#DE000000</color>
+    <color name="radio_button_tint">#FF0000</color>
 
 
 </resources>
