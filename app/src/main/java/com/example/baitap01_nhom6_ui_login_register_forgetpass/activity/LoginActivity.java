@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
                             sharedPref.saveUser(userId, userEmail, userName);
                             // chuyển sang trang chính sau khi login thành công
-                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         }
                     } else {
