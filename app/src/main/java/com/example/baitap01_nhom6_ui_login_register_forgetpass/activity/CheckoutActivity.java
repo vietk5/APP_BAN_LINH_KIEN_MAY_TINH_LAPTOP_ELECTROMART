@@ -3,6 +3,7 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -48,6 +49,7 @@ public class CheckoutActivity extends AppCompatActivity
     private RadioGroup rgPayment;
     private CheckoutItemAdapter checkoutAdapter;
     private String appliedVoucherCode = "";
+    private int isBuyNow = 0;
 
     private final List<CheckoutItem> items = new ArrayList<>();
 
@@ -215,8 +217,9 @@ public class CheckoutActivity extends AppCompatActivity
             for (CheckoutItem ci : items) {
                 productIds.add(ci.getProductId());
             }
-
+            isBuyNow = getIntent().getIntExtra("isBuyNow", 0);
             CheckoutRequest req = new CheckoutRequest(
+                    isBuyNow,
                     userId,
                     receiverName,
                     phone,
@@ -238,17 +241,22 @@ public class CheckoutActivity extends AppCompatActivity
                 bankIntent.putExtra("total_amount", totalFinal);
                 bankIntent.putExtra("checkout_request", req);
                 startActivity(bankIntent);
-
+//                finish();
             } else {
                 api.checkout(req).enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
+                            Log.d("API_SUCCESS", "Order Created for User: " + response.body());
                             Intent successIntent =
                                     new Intent(CheckoutActivity.this, OrderSuccessActivity.class);
                             successIntent.putExtra("total_paid", totalFinal);
                             startActivity(successIntent);
                             finish();
+                        } else {
+                            // Xem mã lỗi: 400 (Dữ liệu sai), 500 (Lỗi code server)
+                            Log.e("API_ERROR", "Mã lỗi: " + response.code());
+                            Toast.makeText(CheckoutActivity.this, "Server từ chối: " + response.code(), Toast.LENGTH_SHORT).show();
                         }
                     }
 
