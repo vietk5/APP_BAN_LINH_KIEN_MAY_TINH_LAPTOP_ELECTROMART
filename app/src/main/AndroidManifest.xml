@@ -18,6 +18,7 @@
         <activity
             android:name=".activity.PcBuilderActivity"
             android:exported="false" />
+        <activity
             android:name=".activity.BankPaymentActivity"
             android:exported="false" />
         <activity
@@ -40,7 +41,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.ProductDetailActivity"
-            android:exported="false" />
             android:exported="false" />
         <activity
             android:name=".activity.MyOrdersActivity"
@@ -65,10 +65,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.LoginActivity"
-            android:exported="false" />
-            android:name=".activity.CartActivity"
-        <activity
-            android:name=".activity.CategoryActivity"
             android:exported="false" />
         <activity
             android:name=".activity.EmptyCartActivity"
