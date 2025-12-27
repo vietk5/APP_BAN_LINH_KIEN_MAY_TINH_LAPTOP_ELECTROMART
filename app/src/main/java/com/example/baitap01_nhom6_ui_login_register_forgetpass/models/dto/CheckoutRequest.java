@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class CheckoutRequest implements Serializable {
+    private int isBuyNow;
     private int userId;
     private String receiverName;
     private String receiverPhone;
@@ -15,9 +16,10 @@ public class CheckoutRequest implements Serializable {
     public CheckoutRequest() {
     }
 
-    public CheckoutRequest(int userId, String receiverName, String receiverPhone,
+    public CheckoutRequest(int isBuyNow, int userId, String receiverName, String receiverPhone,
                            String receiverAddress, String paymentMethod,
                            String voucherCode, List<Long> productIds) {
+        this.isBuyNow = isBuyNow;
         this.userId = userId;
         this.receiverName = receiverName;
         this.receiverPhone = receiverPhone;
@@ -59,7 +61,13 @@ public class CheckoutRequest implements Serializable {
     public void setReceiverAddress(String receiverAddress) {
         this.receiverAddress = receiverAddress;
     }
+    public int getIsBuyNow() {
+        return isBuyNow;
+    }
 
+    public void setIsBuyNow(int isBuyNow) {
+        this.isBuyNow = isBuyNow;
+    }
     public String getPaymentMethod() {
         return paymentMethod;
     }

@@ -192,6 +192,7 @@
             Intent intent =
                     new Intent(ProductDetailActivity.this, CheckoutActivity.class);
             intent.putExtra("items", checkoutItems);
+            intent.putExtra("isBuyNow", 1);
             startActivity(intent);
         }
     

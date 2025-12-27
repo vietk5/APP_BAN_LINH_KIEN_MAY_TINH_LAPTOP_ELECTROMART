@@ -18,6 +18,8 @@
         <activity
             android:name=".activity.PcBuilderActivity"
             android:exported="false" />
+            android:name=".activity.BankPaymentActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.AdminActivity"
             android:exported="false" />
@@ -39,8 +41,6 @@
         <activity
             android:name=".activity.ProductDetailActivity"
             android:exported="false" />
-        <activity
-            android:name=".activity.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".activity.MyOrdersActivity"
@@ -66,12 +66,7 @@
         <activity
             android:name=".activity.LoginActivity"
             android:exported="false" />
-        <activity
             android:name=".activity.CartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.HomeActivity"
-            android:exported="false" />
         <activity
             android:name=".activity.CategoryActivity"
             android:exported="false" />
@@ -113,7 +108,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
