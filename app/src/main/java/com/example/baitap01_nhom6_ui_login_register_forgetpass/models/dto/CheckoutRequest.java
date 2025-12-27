@@ -1,8 +1,9 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CheckoutRequest {
+public class CheckoutRequest implements Serializable {
     private int userId;
     private String receiverName;
     private String receiverPhone;

@@ -225,43 +225,40 @@ public class CheckoutActivity extends AppCompatActivity
                     voucherCode,
                     productIds
             );
+            long subtotal = getSubtotal();
+            long tmpTotal = subtotal + shippingFee - discount;
+            if (tmpTotal < 0) tmpTotal = 0;
 
-            api.checkout(req).enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (response.isSuccessful()) {
+            final long totalFinal = tmpTotal;
 
-                        long subtotal = getSubtotal();
-                        long total = subtotal + shippingFee - discount;
-                        if (total < 0) total = 0;
+            if ("BANK".equals(paymentMethod)) {
 
-                        long[] purchasedIds = new long[items.size()];
-                        for (int i = 0; i < items.size(); i++) {
-                            purchasedIds[i] = items.get(i).getProductId();
+                Intent bankIntent =
+                        new Intent(CheckoutActivity.this, BankPaymentActivity.class);
+                bankIntent.putExtra("total_amount", totalFinal);
+                bankIntent.putExtra("checkout_request", req);
+                startActivity(bankIntent);
+
+            } else {
+                api.checkout(req).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            Intent successIntent =
+                                    new Intent(CheckoutActivity.this, OrderSuccessActivity.class);
+                            successIntent.putExtra("total_paid", totalFinal);
+                            startActivity(successIntent);
+                            finish();
                         }
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("purchased_ids", purchasedIds);
-                        setResult(RESULT_OK, resultIntent);
-
-                        Intent successIntent = new Intent(CheckoutActivity.this, OrderSuccessActivity.class);
-                        successIntent.putExtra("total_paid", total);
-                        startActivity(successIntent);
-
-                        finish();
-                    } else {
-                        Toast.makeText(CheckoutActivity.this,
-                                "Không thể đặt hàng (mã " + response.code() + ")",
-                                Toast.LENGTH_SHORT).show();
                     }
-                }
 
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    Toast.makeText(CheckoutActivity.this,
-                            "Lỗi kết nối: " + t.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(CheckoutActivity.this,
+                                "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         });
     }
 

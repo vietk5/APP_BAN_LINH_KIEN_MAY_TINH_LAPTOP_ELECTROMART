@@ -158,9 +158,10 @@ public class OrderConfirmationActivity extends AppCompatActivity {
 //                order.setPaymentMethod("BANK_TRANSFER");
 //            } else if (checkedId == R.id.rbMomo) {
 //                order.setPaymentMethod("MOMO");
-//            } else if (checkedId == R.id.rbVNPay) {
-//                order.setPaymentMethod("VNPAY");
 //            }
+            else if (checkedId == R.id.rbVNPay) {
+                order.setPaymentMethod("VNPAY");
+            }
         });
     }
 

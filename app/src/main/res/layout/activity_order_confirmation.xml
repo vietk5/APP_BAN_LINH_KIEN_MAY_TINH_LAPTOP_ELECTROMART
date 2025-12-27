@@ -409,13 +409,14 @@
                         <!--                            android:text="Ví MoMo"-->
                         <!--                            android:textSize="14sp" />-->
 
-                        <!--                        <RadioButton-->
-                        <!--                            android:id="@+id/rbVNPay"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="wrap_content"-->
-                        <!--                            android:padding="12dp"-->
-                        <!--                            android:text="VNPay"-->
-                        <!--                            android:textSize="14sp" />-->
+                        <RadioButton
+                            android:id="@+id/rbVNPay"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="12dp"
+                            android:text="VNPay"
+                            android:textSize="14sp"
+                            android:checked="true" />
 
                     </RadioGroup>
 
