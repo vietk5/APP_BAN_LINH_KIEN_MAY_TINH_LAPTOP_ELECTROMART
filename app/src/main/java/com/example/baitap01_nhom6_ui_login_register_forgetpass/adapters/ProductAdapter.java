@@ -18,6 +18,19 @@ import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
     private final List<Product> data;
+
+    // Thêm listener để xử lý sự kiện click từ bên ngoài
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Product product);
+    }
+
+    // Hàm để set listener từ Activity
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public ProductAdapter(List<Product> data) { this.data = data; }
 
     @NonNull @Override
@@ -45,23 +58,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
             h.img.setImageResource(R.drawable.product_item_bg);
         }
 
-        // ⬇⬇⬇ SỬA Ở ĐÂY
+        // SỬA ĐỔI: Kiểm tra listener trước
         h.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
-            intent.putExtra("product_id", p.getId());   // truyền ID *sản phẩm*
-            v.getContext().startActivity(intent);
+            if (listener != null) {
+                // Nếu có listener (đang chọn linh kiện), gọi listener
+                listener.onItemClick(p);
+            } else {
+                // Nếu không (mặc định), mở chi tiết sản phẩm
+                Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
+                intent.putExtra("product_id", p.getId());
+                v.getContext().startActivity(intent);
+            }
         });
-//        h.itemView.setOnClickListener(v -> {
-//            long id = p.getId();
-//
-//
-//            Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
-//            intent.putExtra("product_id", id);
-//            v.getContext().startActivity(intent);
-//        });
-
     }
-
 
     @Override public int getItemCount() { return data.size(); }
 

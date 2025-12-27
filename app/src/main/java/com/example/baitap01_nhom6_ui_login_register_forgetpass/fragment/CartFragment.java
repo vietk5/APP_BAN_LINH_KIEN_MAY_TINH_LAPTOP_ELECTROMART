@@ -190,27 +190,47 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
                     if (cartItems.isEmpty()) goToEmptyCart();
                     return;
                 }
+
                 List<CartItemDto> dtoList = response.body();
-                cartItems.clear();
-                for (CartItemDto dto : dtoList) {
-                    CartItem item = mapDtoToCartItem(dto);
-                    if (item != null) cartItems.add(item);
-                }
-                cartAdapter.notifyDataSetChanged();
-                if (cartItems.isEmpty()) goToEmptyCart();
-                else {
+
+                // ✅ Nếu server trả rỗng mà local đang có -> GIỮ LOCAL, đừng clear
+                if (dtoList.isEmpty()) {
+                    cartAdapter.notifyDataSetChanged();
                     updateSelectAllState();
                     updateSummary();
+                    // nếu cả local cũng rỗng thì mới đi empty
+                    if (cartItems.isEmpty()) goToEmptyCart();
+                    return;
                 }
+
+                // ✅ Có data server thì mới replace local
+                List<CartItem> newList = new ArrayList<>();
+                for (CartItemDto dto : dtoList) {
+                    CartItem item = mapDtoToCartItem(dto);
+                    if (item != null) newList.add(item);
+                }
+
+                cartItems.clear();
+                cartItems.addAll(newList);
+
+                cartAdapter.notifyDataSetChanged();
+                updateSelectAllState();
+                updateSummary();
+
+                if (cartItems.isEmpty()) goToEmptyCart();
             }
 
             @Override
             public void onFailure(Call<List<CartItemDto>> call, Throwable t) {
                 if (cartItems.isEmpty()) goToEmptyCart();
-                else if(getContext()!=null) Toast.makeText(getContext(), "Không tải được giỏ hàng từ server, dùng dữ liệu offline.", Toast.LENGTH_SHORT).show();
+                else if (getContext() != null)
+                    Toast.makeText(getContext(),
+                            "Không tải được giỏ hàng từ server, dùng dữ liệu offline.",
+                            Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private CartItem mapDtoToCartItem(CartItemDto dto) {
         if (dto == null) return null;
@@ -306,4 +326,14 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
         updateSummary();
         if (sizeAfterRemove == 0) goToEmptyCart();
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadCartDataLocal();
+        if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
+        updateSelectAllState();
+        updateSummary();
+        fetchCartFromServer();
+    }
+
 }

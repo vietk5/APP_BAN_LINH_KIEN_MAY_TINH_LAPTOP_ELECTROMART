@@ -3,17 +3,16 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.util;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.CartActivity;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.CategoryActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.ConsultActivity;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.HomeActivity;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.ProfileActivity;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.CartFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.PcBuilderFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.ProfileFragment;
 
 public class BottomNavHelper {
     private static final int COLOR_SELECTED   = 0xFF3B82F6; // xanh
@@ -22,7 +21,7 @@ public class BottomNavHelper {
     private static final int COLOR_UNSELECTED1 = 0xFF0A1EDC; // xanh
     public static void setup(final Activity activity, String currentScreen) {
         LinearLayout btnHome     = activity.findViewById(R.id.btnHome);
-        LinearLayout btnCategory = activity.findViewById(R.id.btnCategory);
+        LinearLayout btnPcBuilder = activity.findViewById(R.id.btnPcBuilder);
         LinearLayout btnConsult  = activity.findViewById(R.id.btnConsult);
         LinearLayout btnCart     = activity.findViewById(R.id.btnCart);
         LinearLayout btnUser     = activity.findViewById(R.id.btnUser);
@@ -31,14 +30,14 @@ public class BottomNavHelper {
 
         btnHome.setOnClickListener(v -> {
             if (!"HOME".equals(currentScreen)) {
-                Intent intent = new Intent(activity, HomeActivity.class);
+                Intent intent = new Intent(activity, HomeFragment.class);
                 activity.startActivity(intent);
             }
         });
 
-        btnCategory.setOnClickListener(v -> {
-            if (!"CATEGORY".equals(currentScreen)) {
-                Intent intent = new Intent(activity, CategoryActivity.class);
+        btnPcBuilder.setOnClickListener(v -> {
+            if (!"PCBUILDER".equals(currentScreen)) {
+                Intent intent = new Intent(activity, PcBuilderFragment.class);
                 activity.startActivity(intent);
             }
         });
@@ -52,14 +51,14 @@ public class BottomNavHelper {
 
         btnCart.setOnClickListener(v -> {
             if (!"CART".equals(currentScreen)) {
-                Intent intent = new Intent(activity, CartActivity.class);
+                Intent intent = new Intent(activity, CartFragment.class);
                 activity.startActivity(intent);
             }
         });
 
         btnUser.setOnClickListener(v -> {
             if (!"PROFILE".equals(currentScreen)) {
-                Intent intent = new Intent(activity, ProfileActivity.class);
+                Intent intent = new Intent(activity, ProfileFragment.class);
                 activity.startActivity(intent);
             }
         });
@@ -90,7 +89,7 @@ public class BottomNavHelper {
             case "HOME":
                 setTabColor(iconHome, labelHome, COLOR_SELECTED);
                 break;
-            case "CATEGORY":
+            case "PCBUILDER":
                 setTabColor(iconCategory, labelCategory, COLOR_SELECTED);
                 break;
             case "CONSULT":

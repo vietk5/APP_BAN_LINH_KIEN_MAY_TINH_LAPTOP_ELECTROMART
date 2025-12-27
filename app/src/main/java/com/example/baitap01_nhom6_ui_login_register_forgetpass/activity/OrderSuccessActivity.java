@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.PriceFormatter;
 
 public class OrderSuccessActivity extends AppCompatActivity {
@@ -30,7 +31,7 @@ public class OrderSuccessActivity extends AppCompatActivity {
 
         // Nút về trang chủ
         btnBackHome.setOnClickListener(v -> {
-            Intent i = new Intent(this, HomeActivity.class);
+            Intent i = new Intent(this, HomeFragment.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
             finish();

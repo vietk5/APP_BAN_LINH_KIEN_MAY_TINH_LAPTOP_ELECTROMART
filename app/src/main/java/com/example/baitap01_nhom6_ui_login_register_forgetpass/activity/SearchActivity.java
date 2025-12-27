@@ -1,15 +1,15 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.content.Intent;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -51,46 +51,65 @@ public class SearchActivity extends AppCompatActivity {
     private final List<Product> displayList = new ArrayList<>();
     private ProductAdapter adapter;
 
-    private final NumberFormat priceFormat =
-            NumberFormat.getInstance(new Locale("vi", "VN"));
+    private final NumberFormat priceFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 
-    // dữ liệu spinner
+    // Dữ liệu spinner
     private final String[] categories = new String[]{
-            "Tất cả",
-            "Laptop",
-            "PC",
-            "Tai nghe",
-            "Màn hình",
-            "Bàn phím",
-            "Chuột",
-            "Loa"
+            "Tất cả", "Laptop", "PC", "Tai nghe", "Màn hình", "Bàn phím", "Chuột", "Loa"
     };
-    private List<String> brandOptions = new ArrayList<>(); // sẽ fill sau khi load products
+    private List<String> brandOptions = new ArrayList<>();
+
+    // Biến để kiểm tra xem có phải đang chọn linh kiện cho PC Builder không
+    private boolean isSelectionMode = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header), (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), v.getPaddingBottom());
             return insets;
         });
+
+        // Kiểm tra chế độ chọn linh kiện
+        isSelectionMode = getIntent().getBooleanExtra("is_selection_mode", false);
+
         initViews();
         setupSystemBarsPadding();
         setupRecycler();
         setupCategorySpinner();
         setupEvents();
 
-        // lấy keyword từ HomeActivity (nếu có)
+        // Lấy keyword từ HomeActivity hoặc PcBuilderFragment
         String keyword = getIntent().getStringExtra("keyword");
         if (keyword != null) {
             edtKeyword.setText(keyword);
+
+            // Nếu là từ khóa đặc biệt của PC Builder (CPU, MAIN, RAM...), ta có thể map sang Category tương ứng
+            mapKeywordToCategory(keyword);
         }
 
-        // load danh sách sản phẩm từ API rồi apply filter
         loadAllProducts();
-        BottomNavHelper.setup(this, "CONSULT");
+
+        // Nếu đang ở chế độ chọn linh kiện, không hiện BottomNav để tập trung chọn
+        if (!isSelectionMode) {
+            BottomNavHelper.setup(this, "CONSULT");
+        }
+    }
+
+    private void mapKeywordToCategory(String keyword) {
+        // Tự động chọn category trên spinner nếu keyword khớp
+        String keyUpper = keyword.toUpperCase();
+        int selectionIndex = 0;
+
+        if (keyUpper.contains("CPU") || keyUpper.contains("MAIN") || keyUpper.contains("RAM") || keyUpper.contains("VGA") || keyUpper.contains("SSD") || keyUpper.contains("HDD") || keyUpper.contains("PSU") || keyUpper.contains("CASE")) {
+            // Các linh kiện này thường nằm trong mục "PC" hoặc "Linh kiện" (nếu có)
+            // Ở đây giả sử bạn xếp chung vào PC hoặc tìm cách filter khác.
+            // Tạm thời để "Tất cả" và để text search làm việc.
+            // Hoặc nếu bạn có category "Linh kiện", hãy trỏ tới đó.
+        }
     }
 
     private void initViews() {
@@ -111,12 +130,7 @@ public class SearchActivity extends AppCompatActivity {
         if (toolbar != null) {
             ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
                 Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(
-                        v.getPaddingLeft(),
-                        bars.top,
-                        v.getPaddingRight(),
-                        v.getPaddingBottom()
-                );
+                v.setPadding(v.getPaddingLeft(), bars.top, v.getPaddingRight(), v.getPaddingBottom());
                 return insets;
             });
         }
@@ -124,53 +138,73 @@ public class SearchActivity extends AppCompatActivity {
 
     private void setupRecycler() {
         recyclerResults.setLayoutManager(new GridLayoutManager(this, 2));
+
+        // Tạo adapter và xử lý sự kiện click
         adapter = new ProductAdapter(displayList);
+
+        // --- QUAN TRỌNG: Xử lý click item ---
+        // ProductAdapter của bạn cần có interface hoặc phương thức để set OnClickListener
+        // Nếu ProductAdapter chưa hỗ trợ setOnItemClickListener từ bên ngoài,
+        // bạn có thể cần sửa ProductAdapter một chút hoặc dùng cách dưới đây nếu adapter hỗ trợ.
+
+        // Giả sử bạn sửa ProductAdapter để nhận listener trong constructor hoặc setter
+        // Hoặc xử lý ngay trong onBindViewHolder của adapter (như cách tôi hướng dẫn trước đó).
+
+        // Tuy nhiên, để sạch code, tôi khuyên bạn thêm interface vào ProductAdapter (xem phần dưới).
+        // Sau đó:
+        adapter.setOnItemClickListener(product -> {
+            if (isSelectionMode) {
+                // Trả kết quả về PcBuilderFragment
+                Intent resultIntent = new Intent();
+                // Product cần implements Serializable hoặc Parcelable để truyền qua Intent
+                // Hoặc truyền ID, Name, Price riêng lẻ
+                resultIntent.putExtra("selected_product", product);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            } else {
+                // Mở màn hình chi tiết sản phẩm bình thường
+                Intent intent = new Intent(SearchActivity.this, ProductDetailActivity.class);
+                intent.putExtra("product_id", product.getId());
+                // Truyền các thông tin khác nếu cần
+                startActivity(intent);
+            }
+        });
+
         recyclerResults.setAdapter(adapter);
     }
 
     private void setupCategorySpinner() {
-        ArrayAdapter<String> catAdapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
+        ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnCategory.setAdapter(catAdapter);
     }
 
     private void setupBrandSpinner() {
-        // brandOptions đã được fill sau khi loadAllProducts()
-        ArrayAdapter<String> brandAdapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, brandOptions);
+        ArrayAdapter<String> brandAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, brandOptions);
         brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnBrand.setAdapter(brandAdapter);
     }
 
     private void setupEvents() {
         btnBack.setOnClickListener(v -> finish());
-
         btnApplyFilter.setOnClickListener(v -> applyFilters());
-
         btnSearch.setOnClickListener(v -> applyFilters());
 
-        // khi đổi category / brand cũng có thể tự apply luôn
         spnCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                applyFilters();
-            }
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { applyFilters(); }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
         spnBrand.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                applyFilters();
-            }
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { applyFilters(); }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
-        Button btnClearFilter = findViewById(R.id.btnClearFilter);
 
+        Button btnClearFilter = findViewById(R.id.btnClearFilter);
         btnClearFilter.setOnClickListener(v -> {
             edtKeyword.setText("");
             edtMinPrice.setText("");
             edtMaxPrice.setText("");
-
             spnCategory.setSelection(0);
             spnBrand.setSelection(0);
             applyFilters();
@@ -187,20 +221,14 @@ public class SearchActivity extends AppCompatActivity {
                 }
                 allProducts.clear();
                 allProducts.addAll(response.body());
-
-                // build danh sách brand cho spinner
                 buildBrandOptions();
                 setupBrandSpinner();
-
-                // apply filter lần đầu
                 applyFilters();
             }
 
             @Override
             public void onFailure(Call<List<ProductDto>> call, Throwable t) {
-                Toast.makeText(SearchActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -219,13 +247,10 @@ public class SearchActivity extends AppCompatActivity {
 
     private void applyFilters() {
         String keyword = edtKeyword.getText().toString().trim().toLowerCase(Locale.ROOT);
-
         Long minPrice = parsePriceInput(edtMinPrice);
         Long maxPrice = parsePriceInput(edtMaxPrice);
-
         String selectedCategory = (String) spnCategory.getSelectedItem();
         if (selectedCategory == null) selectedCategory = "Tất cả";
-
         String selectedBrand = (String) spnBrand.getSelectedItem();
         if (selectedBrand == null) selectedBrand = "Tất cả hãng";
 
@@ -234,60 +259,42 @@ public class SearchActivity extends AppCompatActivity {
         for (ProductDto d : allProducts) {
             String name  = d.name  != null ? d.name  : "";
             String brand = d.brand != null ? d.brand : "";
-            long price   = d.price; // kiểu long theo backend
-
+            long price   = d.price;
             String key = (name + " " + brand).toLowerCase(Locale.ROOT);
 
-            // 1) Keyword
+            // Logic PC Builder: Nếu đang tìm linh kiện (VD: CPU), có thể cần logic filter riêng ở đây
+            // Nhưng hiện tại dùng keyword chung cũng ổn.
+
             boolean matchKeyword = keyword.isEmpty()
                     || name.toLowerCase(Locale.ROOT).contains(keyword)
                     || brand.toLowerCase(Locale.ROOT).contains(keyword);
 
-            // 2) Category
             boolean matchCategory = matchCategory(selectedCategory, key);
+            boolean matchBrand = "Tất cả hãng".equals(selectedBrand) || brand.equalsIgnoreCase(selectedBrand);
 
-            // 3) Brand
-            boolean matchBrand = "Tất cả hãng".equals(selectedBrand)
-                    || brand.equalsIgnoreCase(selectedBrand);
-
-            // 4) Price
             boolean matchPrice = true;
             if (minPrice != null && price < minPrice) matchPrice = false;
             if (maxPrice != null && price > maxPrice) matchPrice = false;
 
             if (matchKeyword && matchCategory && matchBrand && matchPrice) {
-                Product ui = new Product(
-                        d.id,
-                        d.name,
-                        vnd(price),
-                        d.imageUrl
-                );
+                Product ui = new Product(d.id, d.name, vnd(price), d.imageUrl);
+                // Cần set thêm thông tin để PC Builder dùng kiểm tra (nếu Product model hỗ trợ)
+                // ui.setRawPrice(price);
                 displayList.add(ui);
             }
         }
 
         adapter.notifyDataSetChanged();
-        tvResultCount.setText(
-                String.format(Locale.getDefault(), "Tìm thấy %d sản phẩm", displayList.size())
-        );
+        tvResultCount.setText(String.format(Locale.getDefault(), "Tìm thấy %d sản phẩm", displayList.size()));
     }
 
-    /**
-     * Parse giá: cho phép nhập 10–15 => hiểu là 10–15 triệu
-     * Nếu người dùng nhập 10000000 thì giữ nguyên.
-     */
     @Nullable
     private Long parsePriceInput(EditText edt) {
-        String s = edt.getText().toString().trim()
-                .replace(".", "")
-                .replace(",", "");
+        String s = edt.getText().toString().trim().replace(".", "").replace(",", "");
         if (s.isEmpty()) return null;
         try {
             long value = Long.parseLong(s);
-            // nếu nhập < 1000 coi như đã nhập đơn vị "triệu"
-            if (value < 1000) {
-                value = value * 1_000_000L;
-            }
+            if (value < 1000) value = value * 1_000_000L;
             return value;
         } catch (NumberFormatException e) {
             return null;
@@ -296,34 +303,16 @@ public class SearchActivity extends AppCompatActivity {
 
     private boolean matchCategory(String category, String keyLower) {
         keyLower = keyLower.toLowerCase(Locale.ROOT);
-
         if ("Tất cả".equals(category)) return true;
-
         switch (category) {
-            case "Laptop":
-                return keyLower.contains("laptop")
-                        || keyLower.contains("notebook")
-                        || keyLower.contains("macbook");
-            case "PC":
-                return keyLower.contains("pc")
-                        || keyLower.contains("case");
-            case "Tai nghe":
-                return keyLower.contains("tai nghe")
-                        || keyLower.contains("headset");
-            case "Màn hình":
-                return keyLower.contains("màn hình")
-                        || keyLower.contains("monitor");
-            case "Bàn phím":
-                return keyLower.contains("bàn phím")
-                        || keyLower.contains("keyboard");
-            case "Chuột":
-                return keyLower.contains("chuột")
-                        || keyLower.contains("mouse");
-            case "Loa":
-                return keyLower.contains("loa")
-                        || keyLower.contains("speaker");
-            default:
-                return true;
+            case "Laptop": return keyLower.contains("laptop") || keyLower.contains("notebook") || keyLower.contains("macbook");
+            case "PC": return keyLower.contains("pc") || keyLower.contains("case");
+            case "Tai nghe": return keyLower.contains("tai nghe") || keyLower.contains("headset");
+            case "Màn hình": return keyLower.contains("màn hình") || keyLower.contains("monitor");
+            case "Bàn phím": return keyLower.contains("bàn phím") || keyLower.contains("keyboard");
+            case "Chuột": return keyLower.contains("chuột") || keyLower.contains("mouse");
+            case "Loa": return keyLower.contains("loa") || keyLower.contains("speaker");
+            default: return true;
         }
     }
 

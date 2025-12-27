@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.CartActivity; // Vẫn giữ activity cho Cart nếu muốn, hoặc chuyển thành Fragment
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.MainActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.NotificationActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.SearchActivity;

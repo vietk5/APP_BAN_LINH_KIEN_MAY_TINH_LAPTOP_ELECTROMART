@@ -14,6 +14,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.CartFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.CategoryFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.PcBuilderFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.ProfileFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAB_PROFILE = "PROFILE";
 
     // Các nút trong Bottom Nav (layout bottom_navigation.xml)
-    private LinearLayout btnHome, btnCategory, btnConsult, btnCart, btnUser;
+    private LinearLayout btnHome, btnPcBuilder, btnConsult, btnCart, btnUser;
 
     // Header elements (nếu muốn ẩn hiện hoặc thay đổi title theo tab)
     private TextView tvHeaderTitle;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private void initBottomNav() {
         // Ánh xạ từ file include bottom_navigation
         btnHome = findViewById(R.id.btnHome);
-        btnCategory = findViewById(R.id.btnCategory);
+        btnPcBuilder = findViewById(R.id.btnPcBuilder);
         btnConsult = findViewById(R.id.btnConsult); // Nút Tư vấn (ChatBot)
         btnCart = findViewById(R.id.btnCart);
         btnUser = findViewById(R.id.btnUser);
@@ -56,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
             updateBottomNavState(btnHome);
         });
 
-        btnCategory.setOnClickListener(v -> {
-            loadFragment(new CategoryFragment());
-            updateBottomNavState(btnCategory);
+        btnPcBuilder.setOnClickListener(v -> {
+            loadFragment(new PcBuilderFragment());
+            updateBottomNavState(btnPcBuilder);
         });
 
         btnConsult.setOnClickListener(v -> {
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 btnHome.performClick();
                 break;
             case TAB_CATEGORY:
-                btnCategory.performClick();
+                btnPcBuilder.performClick();
                 break;
             case TAB_CART:
                 btnCart.performClick();
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateBottomNavState(LinearLayout selectedBtn) {
         // Reset tất cả về màu xám
         resetBtnState(btnHome);
-        resetBtnState(btnCategory);
+        resetBtnState(btnPcBuilder);
         resetBtnState(btnCart);
         resetBtnState(btnUser);
 

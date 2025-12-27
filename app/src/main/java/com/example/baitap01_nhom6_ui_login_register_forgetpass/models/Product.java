@@ -1,7 +1,10 @@
 // models/Product.java
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.models;
 
-public class Product {
+import java.io.Serializable;
+
+// Thêm 'implements Serializable' để có thể truyền object này qua Intent
+public class Product implements Serializable {
     private long id;
     private String name;
     private String price;       // đã format, dùng cho UI

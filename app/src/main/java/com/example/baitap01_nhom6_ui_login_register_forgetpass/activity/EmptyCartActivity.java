@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
 
 public class EmptyCartActivity extends AppCompatActivity {
     private Button btnShopNow;
@@ -23,7 +24,7 @@ public class EmptyCartActivity extends AppCompatActivity {
         btnShopNow = findViewById(R.id.btn_shop_now);
         // 2. Thiết lập OnClickListener cho Button
         btnShopNow.setOnClickListener(v -> {
-            Intent intent = new Intent(EmptyCartActivity.this, HomeActivity.class);
+            Intent intent = new Intent(EmptyCartActivity.this, HomeFragment.class);
             startActivity(intent);
             finish();
         });

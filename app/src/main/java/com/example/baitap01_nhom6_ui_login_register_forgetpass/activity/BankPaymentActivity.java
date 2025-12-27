@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
@@ -125,7 +126,7 @@ public class BankPaymentActivity extends AppCompatActivity {
     }
 
     private void handlePaymentExit() {
-        Intent intent = new Intent(BankPaymentActivity.this, HomeActivity.class);
+        Intent intent = new Intent(BankPaymentActivity.this, HomeFragment.class);
         startActivity(intent);
         Toast.makeText(this, "Thanh toán thất bại, đơn hàng đã hủy.", Toast.LENGTH_SHORT).show();
         finish();

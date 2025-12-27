@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AddressListActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.ChangePasswordActivity;
-import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.HomeActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.LoginActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.MyOrdersActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.RegisterActivity;
@@ -204,7 +203,7 @@ public class ProfileFragment extends Fragment {
                         .setPositiveButton("Đăng xuất", (dialog, which) -> {
                             sharedPref.logout();
 
-                            Intent intent = new Intent(requireContext(), HomeActivity.class);
+                            Intent intent = new Intent(requireContext(), HomeFragment.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
 
