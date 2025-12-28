@@ -28,6 +28,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPrefManager sharedPref = new SharedPrefManager(this);
+        if (sharedPref.isLoggedIn()) {
+            // Đã login → chuyển thẳng sang MainActivity
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
         edtEmail = findViewById(R.id.edtEmail);

@@ -203,7 +203,7 @@ public class ProfileFragment extends Fragment {
                         .setPositiveButton("Đăng xuất", (dialog, which) -> {
                             sharedPref.logout();
 
-                            Intent intent = new Intent(requireContext(), HomeFragment.class);
+                            Intent intent = new Intent(requireContext(), LoginActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
 
