@@ -51,6 +51,7 @@ public class AdminActivity extends AppCompatActivity {
         MaterialButton btnManageOrders    = findViewById(R.id.btnManageOrders);
         MaterialButton btnManageCustomers = findViewById(R.id.btnManageCustomers);
         MaterialButton btnManageRevenue   = findViewById(R.id.btnManageRevenue);
+        MaterialButton btnManageVouchers = findViewById(R.id.btnManageVouchers);
 
         btnManageProducts.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductActivity.class)));
@@ -63,6 +64,8 @@ public class AdminActivity extends AppCompatActivity {
 
         btnManageRevenue.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminRevenueActivity.class)));
+        btnManageVouchers.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminVoucherActivity.class)));
     }
 
     // ====== GỌI API DASHBOARD (giữ logic cũ) ======

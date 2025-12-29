@@ -21,6 +21,8 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.CheckoutItemAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutItem;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.ApplyVoucherRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.ApplyVoucherResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiService;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.PriceFormatter;
@@ -48,13 +50,16 @@ public class CheckoutActivity extends AppCompatActivity
     private Button btnApplyVoucher, btnPlaceOrder;
     private RadioGroup rgPayment;
     private CheckoutItemAdapter checkoutAdapter;
-    private String appliedVoucherCode = "";
+
+    private String appliedVoucherCode = ""; // code đã apply thành công (hoặc local)
     private int isBuyNow = 0;
 
     private final List<CheckoutItem> items = new ArrayList<>();
 
     private long shippingFee = 30000;  // demo
     private long discount = 0;
+
+    private boolean isApplyingVoucher = false;
 
     private ApiService api;
     private SharedPrefManager pref;
@@ -169,8 +174,9 @@ public class CheckoutActivity extends AppCompatActivity
 
         // Áp dụng voucher
         btnApplyVoucher.setOnClickListener(v -> {
-            appliedVoucherCode = edtVoucher.getText().toString().trim();
-            recomputeDiscountAndTotals(true);
+            String codeInput = edtVoucher.getText().toString().trim();
+            appliedVoucherCode = codeInput; // tạm lưu user nhập
+            applyVoucherAndRecompute(true);
         });
 
         // Xác nhận đặt hàng
@@ -197,9 +203,7 @@ public class CheckoutActivity extends AppCompatActivity
                 return;
             }
 
-            String paymentMethod = (checkedId == R.id.rbCod)
-                    ? "COD"
-                    : "BANK";
+            String paymentMethod = (checkedId == R.id.rbCod) ? "COD" : "BANK";
 
             int userId = pref.getUserId();
             if (userId <= 0) {
@@ -209,7 +213,8 @@ public class CheckoutActivity extends AppCompatActivity
                 return;
             }
 
-            String voucherCode  = edtVoucher.getText().toString().trim();
+            // ✅ gửi đúng voucher đã apply (nếu apply fail thì sẽ rỗng)
+            String voucherCode  = (appliedVoucherCode == null) ? "" : appliedVoucherCode.trim();
             String receiverName = tvReceiverName.getText().toString().trim();
 
             // list productId
@@ -217,7 +222,9 @@ public class CheckoutActivity extends AppCompatActivity
             for (CheckoutItem ci : items) {
                 productIds.add(ci.getProductId());
             }
+
             isBuyNow = getIntent().getIntExtra("isBuyNow", 0);
+
             CheckoutRequest req = new CheckoutRequest(
                     isBuyNow,
                     userId,
@@ -228,20 +235,17 @@ public class CheckoutActivity extends AppCompatActivity
                     voucherCode,
                     productIds
             );
+
             long subtotal = getSubtotal();
             long tmpTotal = subtotal + shippingFee - discount;
             if (tmpTotal < 0) tmpTotal = 0;
-
             final long totalFinal = tmpTotal;
 
             if ("BANK".equals(paymentMethod)) {
-
-                Intent bankIntent =
-                        new Intent(CheckoutActivity.this, BankPaymentActivity.class);
+                Intent bankIntent = new Intent(CheckoutActivity.this, BankPaymentActivity.class);
                 bankIntent.putExtra("total_amount", totalFinal);
                 bankIntent.putExtra("checkout_request", req);
                 startActivity(bankIntent);
-//                finish();
             } else {
                 api.checkout(req).enqueue(new Callback<Void>() {
                     @Override
@@ -254,9 +258,10 @@ public class CheckoutActivity extends AppCompatActivity
                             startActivity(successIntent);
                             finish();
                         } else {
-                            // Xem mã lỗi: 400 (Dữ liệu sai), 500 (Lỗi code server)
                             Log.e("API_ERROR", "Mã lỗi: " + response.code());
-                            Toast.makeText(CheckoutActivity.this, "Server từ chối: " + response.code(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CheckoutActivity.this,
+                                    "Server từ chối: " + response.code(),
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -270,35 +275,108 @@ public class CheckoutActivity extends AppCompatActivity
         });
     }
 
-    private void recomputeDiscountAndTotals(boolean updateVoucherText) {
+    /**
+     * Giữ logic cũ (GIAM10/FREESHIP) + gọi backend cho voucher khác
+     */
+    private void applyVoucherAndRecompute(boolean showMsg) {
+        if (isApplyingVoucher) return;
+
         long subtotal = getSubtotal();
-        String code = appliedVoucherCode == null ? "" : appliedVoucherCode.trim().toUpperCase();
+        String code = (appliedVoucherCode == null) ? "" : appliedVoucherCode.trim().toUpperCase();
 
         discount = 0;
-        String msg;
 
         if (code.isEmpty()) {
-            msg = "Chưa nhập mã giảm giá.";
-        } else if ("GIAM10".equals(code)) {
-            discount = Math.round(subtotal * 0.10);
-            msg = "Áp dụng mã GIAM10: giảm 10% giá trị đơn hàng.";
-        } else if ("FREESHIP".equals(code)) {
-            discount = shippingFee;
-            msg = "Áp dụng mã FREESHIP: miễn phí vận chuyển.";
-        } else {
-            msg = "Mã giảm giá không hợp lệ.";
+            appliedVoucherCode = "";
+            if (showMsg) tvVoucherInfo.setText("Chưa nhập mã giảm giá.");
+            calculateTotals();
+            return;
         }
 
-        if (updateVoucherText) {
-            tvVoucherInfo.setText(msg);
+        // ====== GIỮ CHỨC NĂNG CŨ (LOCAL) ======
+        if ("GIAM10".equals(code)) {
+            discount = Math.round(subtotal * 0.10);
+            appliedVoucherCode = "GIAM10";
+            if (showMsg) tvVoucherInfo.setText("Áp dụng mã GIAM10: giảm 10% giá trị đơn hàng.");
+            calculateTotals();
+            return;
         }
-        calculateTotals();
+
+        if ("FREESHIP".equals(code)) {
+            discount = shippingFee;
+            appliedVoucherCode = "FREESHIP";
+            if (showMsg) tvVoucherInfo.setText("Áp dụng mã FREESHIP: miễn phí vận chuyển.");
+            calculateTotals();
+            return;
+        }
+
+        // ====== VOUCHER THẬT (BACKEND) ======
+        isApplyingVoucher = true;
+        btnApplyVoucher.setEnabled(false);
+        if (showMsg) tvVoucherInfo.setText("Đang áp dụng voucher...");
+
+        // server của bạn đang test bằng tongTien = subtotal (theo ảnh)
+        ApplyVoucherRequest req = new ApplyVoucherRequest(code, subtotal);
+
+        api.applyVoucher(req).enqueue(new Callback<ApplyVoucherResponse>() {
+            @Override
+            public void onResponse(Call<ApplyVoucherResponse> call, Response<ApplyVoucherResponse> response) {
+                isApplyingVoucher = false;
+                btnApplyVoucher.setEnabled(true);
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    appliedVoucherCode = "";
+                    discount = 0;
+                    if (showMsg) tvVoucherInfo.setText("Áp dụng thất bại (" + response.code() + ")");
+                    calculateTotals();
+                    return;
+                }
+
+                ApplyVoucherResponse r = response.body();
+                if (!r.valid) {
+                    appliedVoucherCode = "";
+                    discount = 0;
+                    if (showMsg) tvVoucherInfo.setText(r.message != null ? r.message : "Voucher không hợp lệ");
+                    calculateTotals();
+                    return;
+                }
+
+                // success
+                appliedVoucherCode = code;
+                discount = Math.max(0, r.soTienGiam);
+
+                if (showMsg) {
+                    String m = (r.message != null ? r.message : "Áp dụng voucher thành công");
+                    // nếu discount = 0 thì cảnh báo nhẹ
+                    if (discount == 0) m += " (Voucher hiện giảm 0đ)";
+                    tvVoucherInfo.setText(m);
+                }
+                calculateTotals();
+            }
+
+            @Override
+            public void onFailure(Call<ApplyVoucherResponse> call, Throwable t) {
+                isApplyingVoucher = false;
+                btnApplyVoucher.setEnabled(true);
+
+                appliedVoucherCode = "";
+                discount = 0;
+                if (showMsg) tvVoucherInfo.setText("Lỗi kết nối khi áp voucher");
+                calculateTotals();
+            }
+        });
     }
 
     // callback từ adapter khi quantity bất kỳ item thay đổi
     @Override
     public void onQuantityChanged() {
         updateItemsSummary();
-        recomputeDiscountAndTotals(false);
+
+        // Nếu đang có voucher -> tự cập nhật lại discount
+        if (appliedVoucherCode != null && !appliedVoucherCode.trim().isEmpty()) {
+            applyVoucherAndRecompute(false);
+        } else {
+            calculateTotals();
+        }
     }
 }

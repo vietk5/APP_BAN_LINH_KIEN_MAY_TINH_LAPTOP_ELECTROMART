@@ -17,6 +17,12 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.AdminVoucherFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.AdminVoucherActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.PcBuilderActivity"
             android:exported="false" />
         <activity
@@ -105,6 +111,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -27,6 +27,10 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartIt
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CartRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Address;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.ApplyVoucherRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.ApplyVoucherResponse;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.CreateVoucherRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.VoucherDto;
 
 
 import java.util.List;
@@ -246,5 +250,37 @@ public interface ApiService {
             @Path("id") Long id,
             @Query("userId") Long userId
     );
+
+    // ====== ADMIN VOUCHERS ======
+    @GET("/api/admin/vouchers")
+    Call<List<VoucherDto>> adminListVouchers();
+
+    @POST("/api/admin/vouchers")
+    Call<VoucherDto> adminCreateVoucher(
+            @Body CreateVoucherRequest req
+    );
+
+    @PUT("/api/admin/vouchers/{id}")
+    Call<VoucherDto> adminUpdateVoucher(
+            @Path("id") long id,
+            @Body CreateVoucherRequest req
+    );
+
+    @PATCH("/api/admin/vouchers/{id}/toggle")
+    Call<VoucherDto> adminToggleVoucher(
+            @Path("id") long id,
+            @Query("hoatDong") boolean hoatDong
+    );
+
+    @DELETE("/api/admin/vouchers/{id}")
+    Call<Void> adminDeleteVoucher(@Path("id") long id);
+
+
+    // ====== USER APPLY ======
+    @POST("/api/vouchers/apply")
+    Call<ApplyVoucherResponse> applyVoucher(
+            @Body ApplyVoucherRequest req
+    );
+
 
 }

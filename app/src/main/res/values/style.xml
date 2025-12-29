@@ -7,4 +7,12 @@
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+    <style name="AdminHintText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/adminTextPrimary</item>
+    </style>
+
+    <style name="AdminInputText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/adminTextPrimary</item>
+    </style>
+
 </resources>

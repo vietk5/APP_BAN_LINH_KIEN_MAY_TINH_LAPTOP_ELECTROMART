@@ -59,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Xử lí login
         btnLogin.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
@@ -67,6 +66,20 @@ public class LoginActivity extends AppCompatActivity {
             // Validate email
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ✅ ADMIN HARD-CODE (theo yêu cầu)
+            if (email.equalsIgnoreCase("admin@electromart.com") && password.equals("admin123")) {
+                // (tuỳ chọn) lưu trạng thái admin để lần sau vào thẳng admin
+                SharedPrefManager sp = new SharedPrefManager(LoginActivity.this);
+                sp.saveUser(0, "admin@electromart.com", "Admin"); // hoặc tạo method saveAdmin
+                // nếu bạn có saveAdmin/isAdmin thì dùng sẽ chuẩn hơn
+
+                Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
                 return;
             }
 
@@ -88,10 +101,9 @@ public class LoginActivity extends AppCompatActivity {
                             String userEmail = res.getData().getEmail();
                             String userName = res.getData().getHoTen();
 
-                            // LƯU VÀO SharedPreferences
                             SharedPrefManager sharedPref = new SharedPrefManager(LoginActivity.this);
                             sharedPref.saveUser(userId, userEmail, userName);
-                            // chuyển sang trang chính sau khi login thành công
+
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         }
@@ -99,6 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Lỗi server", Toast.LENGTH_SHORT).show();
                     }
                 }
+
                 @Override
                 public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
                     Toast.makeText(LoginActivity.this, "Không thể kết nối API", Toast.LENGTH_SHORT).show();

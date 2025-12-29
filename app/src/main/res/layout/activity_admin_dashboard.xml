@@ -189,6 +189,19 @@
                             app:iconTint="@color/border_light"
                             android:textColor="@color/border_light"
                             app:strokeColor="#FF9800" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnManageVouchers"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:text="Quản lý voucher"
+                            android:textAllCaps="false"
+                            android:textColor="@color/border_light"
+                            app:icon="@drawable/ic_voucher"
+                            app:iconTint="@color/border_light"
+                            app:strokeColor="#FF9800" />
+
 
                     </GridLayout>
                 </LinearLayout>
@@ -202,9 +215,10 @@
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"
+                    android:layout_height="127dp"
                     android:layout_marginTop="80dp"
-                    android:layout_height="200dp"
                     app:srcCompat="@drawable/logo" />
+
                 <TextView
                     android:id="@+id/textView5"
                     android:textSize="20dp"

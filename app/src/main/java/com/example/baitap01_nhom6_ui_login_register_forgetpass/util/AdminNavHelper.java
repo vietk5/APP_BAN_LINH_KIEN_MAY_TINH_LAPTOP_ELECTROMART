@@ -1,5 +1,7 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.util;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -11,6 +13,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminCus
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminOrdersActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminProductActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.AdminRevenueActivity;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.LoginActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class AdminNavHelper {
@@ -54,9 +57,15 @@ public class AdminNavHelper {
                 if (act instanceof AdminRevenueActivity) return true;
                 intent = new Intent(act, AdminRevenueActivity.class);
             } else if (id == R.id.nav_logout) {
+                // ✅ Logout ở mọi màn admin
+                SharedPrefManager sp = new SharedPrefManager(act);
+                sp.logout(); // bạn cần có hàm này (mình hướng dẫn bên dưới)
+
                 Toast.makeText(act, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
-                // TODO: Thêm logic xóa token/session và chuyển về LoginActivity
-                return true;
+
+                intent = new Intent(act, LoginActivity.class);
+                // ✅ clear sạch stack
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             } else if (id == R.id.nav_admin) {
                 if (act instanceof AdminActivity) return true;
                 // Nếu muốn quay về Dashboard và xóa hết các màn hình cũ trong stack
