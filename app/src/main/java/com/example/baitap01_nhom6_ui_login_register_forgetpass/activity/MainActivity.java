@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
@@ -31,11 +34,16 @@ public class MainActivity extends AppCompatActivity {
     // Header elements (nếu muốn ẩn hiện hoặc thay đổi title theo tab)
     private TextView tvHeaderTitle;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootMain), (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            v.setPadding(0, bars.top, 0, 0);
+            return insets;
+        });
         initBottomNav();
 
         // Mặc định load Home
@@ -78,6 +86,10 @@ public class MainActivity extends AppCompatActivity {
             loadFragment(new ProfileFragment());
             updateBottomNavState(btnUser);
         });
+        findViewById(R.id.fabSpin).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, LuckySpinActivity.class));
+        });
+
     }
 
     // Hàm load Fragment vào container

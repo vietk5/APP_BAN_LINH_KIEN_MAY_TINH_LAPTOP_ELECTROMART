@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0B1220">
+
+    <!-- APP BAR -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarSpin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#0F1B33"
+        android:title="Vòng quay may mắn"
+        android:titleTextColor="@android:color/white"
+        app:titleCentered="true"/>
+
+    <!-- CONTENT -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="16dp"
+        android:layout_marginBottom="78dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#0F1B33"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:id="@+id/tvSpinTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hôm nay bạn còn:"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/tvSpinRemain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1 lượt quay"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:layout_marginTop="2dp"/>
+
+                    <TextView
+                        android:id="@+id/tvSpinStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:textColor="#B3FFFFFF"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Wheel Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="#0F1B33">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="360dp"
+                        android:foregroundGravity="center"
+                        android:gravity="center">
+
+                        <com.example.baitap01_nhom6_ui_login_register_forgetpass.widget.LuckyWheelView
+                            android:id="@+id/wheelView"
+                            android:layout_width="320dp"
+                            android:layout_height="320dp"/>
+
+                        <!-- pointer -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_gravity="top|center_horizontal"
+                            app:cardCornerRadius="17dp"
+                            app:cardElevation="6dp"
+                            app:cardBackgroundColor="#FF9800"
+                            android:layout_marginTop="6dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="▼"
+                                android:gravity="center"
+                                android:textColor="#0B1220"
+                                android:textStyle="bold"
+                                android:textSize="18sp"/>
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </FrameLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSpin"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:text="Quay ngay"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:layout_marginTop="12dp"
+                        app:cornerRadius="16dp"
+                        app:backgroundTint="#FF9800"
+                        app:iconPadding="8dp"
+                        app:iconTint="#0B1220"/>
+
+                    <TextView
+                        android:id="@+id/tvHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tip: Quay mỗi ngày để nhận voucher nhé!"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp"/>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Nav -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavSpin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#0F1B33"
+        app:itemIconTint="#FFFFFF"
+        app:itemTextColor="#FFFFFF"
+        app:menu="@menu/menu_bottom_spin" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

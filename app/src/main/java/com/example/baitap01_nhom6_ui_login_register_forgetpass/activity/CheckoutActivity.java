@@ -2,6 +2,8 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -51,12 +53,13 @@ public class CheckoutActivity extends AppCompatActivity
     private RadioGroup rgPayment;
     private CheckoutItemAdapter checkoutAdapter;
 
-    private String appliedVoucherCode = ""; // code đã apply thành công (hoặc local)
+    private String appliedVoucherCode = "";     // ✅ code đã apply thành công
+    private String currentInputVoucher = "";    // ✅ code người dùng đang gõ
     private int isBuyNow = 0;
 
     private final List<CheckoutItem> items = new ArrayList<>();
 
-    private long shippingFee = 30000;  // demo
+    private long shippingFee = 30000;
     private long discount = 0;
 
     private boolean isApplyingVoucher = false;
@@ -64,13 +67,17 @@ public class CheckoutActivity extends AppCompatActivity
     private ApiService api;
     private SharedPrefManager pref;
 
+    // debounce khi user sửa code / đổi quantity
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable debounceRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
         pref = new SharedPrefManager(this);
-        api  = ApiClient.get();
+        api = ApiClient.get();
 
         initViews();
         applyWindowInsets();
@@ -159,7 +166,6 @@ public class CheckoutActivity extends AppCompatActivity
 
     private void calculateTotals() {
         long subtotal = getSubtotal();
-
         long total = subtotal + shippingFee - discount;
         if (total < 0) total = 0;
 
@@ -172,15 +178,29 @@ public class CheckoutActivity extends AppCompatActivity
 
     private void setupEvents() {
 
-        // Áp dụng voucher
+        // nút apply
         btnApplyVoucher.setOnClickListener(v -> {
-            String codeInput = edtVoucher.getText().toString().trim();
-            appliedVoucherCode = codeInput; // tạm lưu user nhập
-            applyVoucherAndRecompute(true);
+            currentInputVoucher = safeUpper(edtVoucher.getText().toString());
+            applyVoucherAndRecompute(true, currentInputVoucher);
         });
 
-        // Xác nhận đặt hàng
+        // nếu user sửa voucher code -> debounce apply lại (đỡ spam API)
+        edtVoucher.addTextChangedListener(new SimpleTextWatcher() {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentInputVoucher = safeUpper(s.toString());
+                // nếu user đang sửa -> coi như chưa apply
+                // (chỉ khi họ bấm apply hoặc debounce xong mới apply lại)
+                debounceApply(currentInputVoucher);
+            }
+        });
+
+        // đặt hàng
         btnPlaceOrder.setOnClickListener(v -> {
+            if (isApplyingVoucher) {
+                Toast.makeText(this, "Đang áp dụng voucher, vui lòng đợi...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String phone   = edtReceiverPhone.getText().toString().trim();
             String address = edtReceiverAddress.getText().toString().trim();
 
@@ -197,9 +217,7 @@ public class CheckoutActivity extends AppCompatActivity
 
             int checkedId = rgPayment.getCheckedRadioButtonId();
             if (checkedId == -1) {
-                Toast.makeText(this,
-                        "Vui lòng chọn phương thức thanh toán",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -207,21 +225,17 @@ public class CheckoutActivity extends AppCompatActivity
 
             int userId = pref.getUserId();
             if (userId <= 0) {
-                Toast.makeText(this,
-                        "Lỗi tài khoản, vui lòng đăng nhập lại",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Lỗi tài khoản, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // ✅ gửi đúng voucher đã apply (nếu apply fail thì sẽ rỗng)
-            String voucherCode  = (appliedVoucherCode == null) ? "" : appliedVoucherCode.trim();
+            // ✅ CHỈ gửi voucher đã apply thành công
+            String voucherCode = (appliedVoucherCode == null) ? "" : appliedVoucherCode.trim();
+
             String receiverName = tvReceiverName.getText().toString().trim();
 
-            // list productId
             List<Long> productIds = new ArrayList<>();
-            for (CheckoutItem ci : items) {
-                productIds.add(ci.getProductId());
-            }
+            for (CheckoutItem ci : items) productIds.add(ci.getProductId());
 
             isBuyNow = getIntent().getIntExtra("isBuyNow", 0);
 
@@ -242,23 +256,24 @@ public class CheckoutActivity extends AppCompatActivity
             final long totalFinal = tmpTotal;
 
             if ("BANK".equals(paymentMethod)) {
-                Intent bankIntent = new Intent(CheckoutActivity.this, BankPaymentActivity.class);
+                Intent bankIntent = new Intent(this, BankPaymentActivity.class);
                 bankIntent.putExtra("total_amount", totalFinal);
                 bankIntent.putExtra("checkout_request", req);
                 startActivity(bankIntent);
             } else {
+                btnPlaceOrder.setEnabled(false);
                 api.checkout(req).enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
+                        btnPlaceOrder.setEnabled(true);
+
                         if (response.isSuccessful()) {
-                            Log.d("API_SUCCESS", "Order Created for User: " + response.body());
-                            Intent successIntent =
-                                    new Intent(CheckoutActivity.this, OrderSuccessActivity.class);
+                            Intent successIntent = new Intent(CheckoutActivity.this, OrderSuccessActivity.class);
                             successIntent.putExtra("total_paid", totalFinal);
                             startActivity(successIntent);
                             finish();
                         } else {
-                            Log.e("API_ERROR", "Mã lỗi: " + response.code());
+                            Log.e("API_ERROR", "Checkout fail: " + response.code());
                             Toast.makeText(CheckoutActivity.this,
                                     "Server từ chối: " + response.code(),
                                     Toast.LENGTH_SHORT).show();
@@ -267,24 +282,44 @@ public class CheckoutActivity extends AppCompatActivity
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(CheckoutActivity.this,
-                                "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                        btnPlaceOrder.setEnabled(true);
+                        Toast.makeText(CheckoutActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
     }
 
-    /**
-     * Giữ logic cũ (GIAM10/FREESHIP) + gọi backend cho voucher khác
-     */
-    private void applyVoucherAndRecompute(boolean showMsg) {
+    private void debounceApply(String codeUpper) {
+        if (debounceRunnable != null) handler.removeCallbacks(debounceRunnable);
+        debounceRunnable = () -> {
+            // chỉ auto-apply nếu user có nhập gì đó
+            if (codeUpper != null && !codeUpper.isEmpty()) {
+                applyVoucherAndRecompute(false, codeUpper);
+            } else {
+                // rỗng -> reset
+                appliedVoucherCode = "";
+                discount = 0;
+                tvVoucherInfo.setText("");
+                calculateTotals();
+            }
+        };
+        handler.postDelayed(debounceRunnable, 450);
+    }
+
+    private void setApplyingUi(boolean applying) {
+        isApplyingVoucher = applying;
+        btnApplyVoucher.setEnabled(!applying);
+        btnPlaceOrder.setEnabled(!applying);
+    }
+
+    private void applyVoucherAndRecompute(boolean showMsg, String codeUpper) {
         if (isApplyingVoucher) return;
 
         long subtotal = getSubtotal();
-        String code = (appliedVoucherCode == null) ? "" : appliedVoucherCode.trim().toUpperCase();
-
         discount = 0;
+
+        String code = safeUpper(codeUpper);
 
         if (code.isEmpty()) {
             appliedVoucherCode = "";
@@ -293,11 +328,11 @@ public class CheckoutActivity extends AppCompatActivity
             return;
         }
 
-        // ====== GIỮ CHỨC NĂNG CŨ (LOCAL) ======
+        // ====== LOCAL VOUCHER CŨ ======
         if ("GIAM10".equals(code)) {
             discount = Math.round(subtotal * 0.10);
             appliedVoucherCode = "GIAM10";
-            if (showMsg) tvVoucherInfo.setText("Áp dụng mã GIAM10: giảm 10% giá trị đơn hàng.");
+            if (showMsg) tvVoucherInfo.setText("Áp dụng GIAM10: giảm 10%.");
             calculateTotals();
             return;
         }
@@ -305,24 +340,21 @@ public class CheckoutActivity extends AppCompatActivity
         if ("FREESHIP".equals(code)) {
             discount = shippingFee;
             appliedVoucherCode = "FREESHIP";
-            if (showMsg) tvVoucherInfo.setText("Áp dụng mã FREESHIP: miễn phí vận chuyển.");
+            if (showMsg) tvVoucherInfo.setText("Áp dụng FREESHIP: miễn phí vận chuyển.");
             calculateTotals();
             return;
         }
 
-        // ====== VOUCHER THẬT (BACKEND) ======
-        isApplyingVoucher = true;
-        btnApplyVoucher.setEnabled(false);
+        // ====== BACKEND VOUCHER ======
+        setApplyingUi(true);
         if (showMsg) tvVoucherInfo.setText("Đang áp dụng voucher...");
 
-        // server của bạn đang test bằng tongTien = subtotal (theo ảnh)
         ApplyVoucherRequest req = new ApplyVoucherRequest(code, subtotal);
 
         api.applyVoucher(req).enqueue(new Callback<ApplyVoucherResponse>() {
             @Override
             public void onResponse(Call<ApplyVoucherResponse> call, Response<ApplyVoucherResponse> response) {
-                isApplyingVoucher = false;
-                btnApplyVoucher.setEnabled(true);
+                setApplyingUi(false);
 
                 if (!response.isSuccessful() || response.body() == null) {
                     appliedVoucherCode = "";
@@ -333,32 +365,43 @@ public class CheckoutActivity extends AppCompatActivity
                 }
 
                 ApplyVoucherResponse r = response.body();
+
                 if (!r.valid) {
                     appliedVoucherCode = "";
                     discount = 0;
-                    if (showMsg) tvVoucherInfo.setText(r.message != null ? r.message : "Voucher không hợp lệ");
+                    if (showMsg) tvVoucherInfo.setText(
+                            (r.message != null && !r.message.isEmpty()) ? r.message : "Voucher không hợp lệ"
+                    );
                     calculateTotals();
                     return;
                 }
 
-                // success
+                // ✅ parse tiền giảm an toàn
+                long giam;
+                try {
+                    // nếu soTienGiam là double
+                    giam = (long) Math.floor(r.soTienGiam);
+                } catch (Exception ex) {
+                    giam = 0;
+                }
+                if (giam < 0) giam = 0;
+                if (giam > subtotal + shippingFee) giam = subtotal + shippingFee;
+
                 appliedVoucherCode = code;
-                discount = Math.max(0, r.soTienGiam);
+                discount = giam;
 
                 if (showMsg) {
                     String m = (r.message != null ? r.message : "Áp dụng voucher thành công");
-                    // nếu discount = 0 thì cảnh báo nhẹ
-                    if (discount == 0) m += " (Voucher hiện giảm 0đ)";
+                    if (discount == 0) m += " (Giảm 0đ — kiểm tra điều kiện voucher/max giảm)";
                     tvVoucherInfo.setText(m);
                 }
+
                 calculateTotals();
             }
 
             @Override
             public void onFailure(Call<ApplyVoucherResponse> call, Throwable t) {
-                isApplyingVoucher = false;
-                btnApplyVoucher.setEnabled(true);
-
+                setApplyingUi(false);
                 appliedVoucherCode = "";
                 discount = 0;
                 if (showMsg) tvVoucherInfo.setText("Lỗi kết nối khi áp voucher");
@@ -367,16 +410,26 @@ public class CheckoutActivity extends AppCompatActivity
         });
     }
 
-    // callback từ adapter khi quantity bất kỳ item thay đổi
+    private String safeUpper(String s) {
+        if (s == null) return "";
+        return s.trim().toUpperCase();
+    }
+
     @Override
     public void onQuantityChanged() {
         updateItemsSummary();
 
-        // Nếu đang có voucher -> tự cập nhật lại discount
-        if (appliedVoucherCode != null && !appliedVoucherCode.trim().isEmpty()) {
-            applyVoucherAndRecompute(false);
+        // Nếu voucher đã apply -> apply lại để ra discount mới
+        if (appliedVoucherCode != null && !appliedVoucherCode.isEmpty()) {
+            applyVoucherAndRecompute(false, appliedVoucherCode);
         } else {
             calculateTotals();
         }
+    }
+
+    // ---- SimpleTextWatcher để khỏi phải override 3 hàm ----
+    public abstract static class SimpleTextWatcher implements android.text.TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void afterTextChanged(android.text.Editable s) {}
     }
 }

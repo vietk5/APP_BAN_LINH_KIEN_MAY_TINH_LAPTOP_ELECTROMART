@@ -36,4 +36,16 @@ public class SharedPrefManager {
         editor.clear();
         editor.apply();
     }
+    private static final String KEY_LAST_VOUCHER = "last_voucher";
+
+    public void saveLastVoucherCode(String code){
+        pref.edit().putString(KEY_LAST_VOUCHER, code).apply();
+    }
+    public String getLastVoucherCode(){
+        return pref.getString(KEY_LAST_VOUCHER, "");
+    }
+    public void clearLastVoucherCode(){
+        pref.edit().remove(KEY_LAST_VOUCHER).apply();
+    }
+
 }

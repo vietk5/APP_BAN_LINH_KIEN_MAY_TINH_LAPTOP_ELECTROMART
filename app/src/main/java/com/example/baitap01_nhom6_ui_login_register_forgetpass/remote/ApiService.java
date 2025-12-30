@@ -12,6 +12,9 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Produc
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CategoryDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.RatingSummary;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ResetPasswordRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinResultResponse;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinStatusResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UpdateProfileRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
@@ -281,6 +284,13 @@ public interface ApiService {
     Call<ApplyVoucherResponse> applyVoucher(
             @Body ApplyVoucherRequest req
     );
+
+    @GET("/api/spin/status")
+    Call<SpinStatusResponse> getSpinStatus(@Query("userId") long userId);
+
+    @POST("/api/spin")
+    Call<SpinResultResponse> spin(@Body SpinRequest req);
+
 
 
 }
