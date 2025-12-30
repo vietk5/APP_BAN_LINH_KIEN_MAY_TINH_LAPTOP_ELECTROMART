@@ -32,6 +32,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
     public interface OnOrderClickListener {
         void onViewDetailClick(Order order);
         void onReorderClick(Order order);
+        void onCancelOrderClick(Order order);
     }
 
     public MyOrdersAdapter(Context context, List<Order> orderList) {
@@ -111,6 +112,11 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
                 listener.onReorderClick(order);
             }
         });
+        holder.btnCancelOrder.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCancelOrderClick(order);
+            }
+        });
 
         // Ẩn/hiện nút Mua lại
         if (order.getStatus().equals("HOAN_THANH") || order.getStatus().equals("DA_HUY")) {
@@ -118,6 +124,13 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         } else {
             holder.btnReorder.setVisibility(View.GONE);
         }
+        // Ẩn/hiện nút Huỷ
+        if ("DANG_XU_LY".equals(order.getStatus())) {
+            holder.btnCancelOrder.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnCancelOrder.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -179,6 +192,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         TextView tvProductName, tvProductCount;
         TextView btnViewDetail, tvTotalPrice;
         MaterialButton btnReorder;
+        MaterialButton btnCancelOrder;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -192,6 +206,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
             btnViewDetail = itemView.findViewById(R.id.btnViewDetail);
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
             btnReorder = itemView.findViewById(R.id.btnReorder);
+            btnCancelOrder = itemView.findViewById(R.id.btnCancelOrder);
         }
     }
 }

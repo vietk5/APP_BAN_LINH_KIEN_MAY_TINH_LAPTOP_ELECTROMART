@@ -291,6 +291,6 @@ public interface ApiService {
     @POST("/api/spin")
     Call<SpinResultResponse> spin(@Body SpinRequest req);
 
-
-
+    @PATCH("api/user/orders/{orderId}/cancel")
+    Call<Void> cancelOrder(@Path("orderId") long orderId);
 }
