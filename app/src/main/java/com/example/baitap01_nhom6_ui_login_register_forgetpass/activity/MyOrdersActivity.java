@@ -287,5 +287,42 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
 
         return order;
     }
+    @Override
+    public void onCancelOrderClick(Order order) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận huỷ đơn")
+                .setMessage("Bạn có chắc chắn muốn huỷ đơn hàng này không?")
+                .setPositiveButton("Huỷ đơn", (dialog, which) -> {
+                    callCancelOrderApi(order);
+                })
+                .setNegativeButton("Không", null)
+                .show();
+    }
+    private void callCancelOrderApi(Order order) {
+        ApiClient.get().cancelOrder(Long.parseLong(order.getOrderId()))
+                .enqueue(new retrofit2.Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Huỷ đơn thành công",
+                                    Toast.LENGTH_SHORT).show();
 
+                            order.setStatus("DA_HUY");
+                            filterOrders();
+                        } else {
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Không thể huỷ đơn",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(MyOrdersActivity.this,
+                                "Lỗi: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 }

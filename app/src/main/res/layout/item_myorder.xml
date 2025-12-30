@@ -200,6 +200,21 @@
             app:cornerRadius="24dp"
             app:backgroundTint="#1976D2" />
 
+        <!-- Nút Huỷ -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelOrder"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:text="Huỷ"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            app:cornerRadius="24dp"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#F44336"
+            android:visibility="gone" />
+
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
