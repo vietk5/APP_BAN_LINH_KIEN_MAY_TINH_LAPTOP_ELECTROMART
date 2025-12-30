@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.OnboardingPref;
 
 public class FirstPage extends AppCompatActivity {
 
@@ -19,6 +20,11 @@ public class FirstPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        if (!OnboardingPref.isDone(this)) {
+            startActivity(new Intent(this, OnboardingActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_first_page);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

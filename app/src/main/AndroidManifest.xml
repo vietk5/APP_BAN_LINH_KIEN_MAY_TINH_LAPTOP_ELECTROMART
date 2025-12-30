@@ -17,6 +17,9 @@
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.OnboardingActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.LuckySpinActivity"
             android:exported="false" />
         <activity
@@ -81,9 +84,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.ChatBotActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.OrderConfirmationActivity"
             android:exported="false" />
         <activity
             android:name=".activity.ProductEntryActivity"
