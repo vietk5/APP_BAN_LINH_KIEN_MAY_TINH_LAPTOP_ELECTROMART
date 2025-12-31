@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.LuckySpinActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.MainActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.NotificationActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.ProductDetailActivity;
@@ -40,6 +41,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.util.SharedPrefManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -74,6 +76,7 @@ public class HomeFragment extends Fragment {
     private TextView tvWelcomeMessage;
     private EditText edtSearch;
     private ImageView btnSearch, btnCartHeader, btnNotification;
+    private FloatingActionButton fabSpin;
 
     // tab nhanh
     private LinearLayout btnTabPc, btnTabLaptop, btnTabHeadphone,
@@ -158,6 +161,7 @@ public class HomeFragment extends Fragment {
 
         bannerViewPager = view.findViewById(R.id.bannerViewPager);
         tvCountdown = view.findViewById(R.id.tvCountdown);
+        fabSpin = view.findViewById(R.id.fabSpin);
 
     }
 
@@ -261,6 +265,13 @@ public class HomeFragment extends Fragment {
             }
             return false;
         });
+        // ✅ Wheel spin chỉ hiện và xử lý ở Home
+        if (fabSpin != null) {
+            fabSpin.setOnClickListener(v -> {
+                if (getContext() == null) return;
+                startActivity(new Intent(getContext(), LuckySpinActivity.class));
+            });
+        }
     }
 
     private void doSearch() {

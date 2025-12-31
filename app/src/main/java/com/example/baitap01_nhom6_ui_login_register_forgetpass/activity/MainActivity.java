@@ -86,10 +86,6 @@ public class MainActivity extends AppCompatActivity {
             loadFragment(new ProfileFragment());
             updateBottomNavState(btnUser);
         });
-        findViewById(R.id.fabSpin).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, LuckySpinActivity.class));
-        });
-
     }
 
     // Hàm load Fragment vào container

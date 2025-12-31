@@ -36,21 +36,4 @@
 
 
     </LinearLayout>
-    <!-- ✅ FAB đặt ở ngoài bottom nav để không làm layout bị "ăn" -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSpin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/bottom_navigation_container"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="14dp"
-        android:layout_marginBottom="78dp"
-        android:contentDescription="Lucky spin"
-        app:srcCompat="@drawable/ic_wheel_spin"
-        app:tint="@null"
-        app:backgroundTint="#FFFFFF"
-        app:fabCustomSize="64dp"
-        app:maxImageSize="40dp"
-        app:elevation="8dp" />
-
 </RelativeLayout>
