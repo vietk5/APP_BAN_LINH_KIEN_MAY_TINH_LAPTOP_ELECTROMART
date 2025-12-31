@@ -3,6 +3,7 @@ package com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.SpannableStringBuilder;
@@ -30,8 +31,10 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.MainActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.NotificationActivity;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.ProductDetailActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.SearchActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.BannerAdapter;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.FlashSaleAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.ProductAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ProductDto;
@@ -53,7 +56,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerFlashSale, recyclerProducts, recyclerNewProducts,
             recyclerLaptops, recyclerHeadphones, recyclerSound, recyclerPc;
 
-    private final List<Product> flashData     = new ArrayList<>();
+    // Dữ liệu cho các grid cũ (ProductAdapter dùng Product model)
     private final List<Product> hotData       = new ArrayList<>();
     private final List<Product> newData       = new ArrayList<>();
     private final List<Product> lapData       = new ArrayList<>();
@@ -61,7 +64,11 @@ public class HomeFragment extends Fragment {
     private final List<Product> pcData        = new ArrayList<>();
     private final List<Product> soundData     = new ArrayList<>();
 
-    private ProductAdapter flashAdp, hotAdp, newAdp, lapAdp, soundAdp, pcAdp, headPhoneAdp;
+    // Flash sale dùng ProductDto để tính -5% và hiển thị giá cũ gạch
+    private final List<ProductDto> flashSaleDtos = new ArrayList<>();
+    private FlashSaleAdapter flashSaleAdapter;
+
+    private ProductAdapter hotAdp, newAdp, lapAdp, soundAdp, pcAdp, headPhoneAdp;
 
     // header
     private TextView tvWelcomeMessage;
@@ -78,6 +85,11 @@ public class HomeFragment extends Fragment {
 
     // shared pref
     private SharedPrefManager sharedPrefManager;
+    // 10 phút (bạn muốn bao nhiêu thì đổi)
+    private TextView tvCountdown;
+    private CountDownTimer flashTimer;
+    private static final long FLASH_DURATION_MS = 10 * 60 * 1000L;
+    private long flashRemainMs = FLASH_DURATION_MS;
 
     private final List<Integer> bannerImages = Arrays.asList(
             R.drawable.hero_1,
@@ -93,15 +105,13 @@ public class HomeFragment extends Fragment {
             int current = bannerViewPager.getCurrentItem();
             int next = (current + 1) % bannerImages.size();
             bannerViewPager.setCurrentItem(next, true);
-            bannerHandler.postDelayed(this, 4000); // 4s đổi 1 ảnh
+            bannerHandler.postDelayed(this, 4000);
         }
     };
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Sử dụng lại layout activity_home.xml nhưng cần bỏ thẻ <include footer> trong file xml đó đi
-        // Hoặc tạo file fragment_home.xml tương tự activity_home.xml nhưng bỏ footer
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -114,6 +124,8 @@ public class HomeFragment extends Fragment {
         }
 
         initViews(view);
+        startFlashCountdown(FLASH_DURATION_MS);
+
         setupRecyclerViews();
         setupBannerSlider();
         updateWelcomeMessage();
@@ -143,7 +155,10 @@ public class HomeFragment extends Fragment {
         btnTabMonitor   = view.findViewById(R.id.btnTabMonitor);
         btnTabKeyboard  = view.findViewById(R.id.btnTabKeyboard);
         btnTabMouse     = view.findViewById(R.id.btnTabMouse);
+
         bannerViewPager = view.findViewById(R.id.bannerViewPager);
+        tvCountdown = view.findViewById(R.id.tvCountdown);
+
     }
 
     private void updateWelcomeMessage() {
@@ -152,10 +167,11 @@ public class HomeFragment extends Fragment {
             if (customerName != null && !customerName.trim().isEmpty()) {
                 String prefix = "Chào mừng bạn ";
                 String suffix = " đến với ElectroMart";
-                String full    = prefix + customerName + suffix;
+                String full = prefix + customerName + suffix;
+
                 SpannableStringBuilder ssb = new SpannableStringBuilder(full);
                 int start = prefix.length();
-                int end   = start + customerName.length();
+                int end = start + customerName.length();
                 ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tvWelcomeMessage.setText(ssb);
                 return;
@@ -166,7 +182,11 @@ public class HomeFragment extends Fragment {
 
     private void setupRecyclerViews() {
         if (getContext() == null) return;
+
+        // Flash sale: ngang
         recyclerFlashSale.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        // Grid sections
         recyclerProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerNewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerLaptops.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -174,7 +194,27 @@ public class HomeFragment extends Fragment {
         recyclerSound.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerPc.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        flashAdp     = new ProductAdapter(flashData);
+        flashSaleAdapter = new FlashSaleAdapter(flashSaleDtos, p -> {
+            if (getContext() == null) return;
+
+            Intent i = new Intent(getContext(), ProductDetailActivity.class);
+
+            // ✅ phải trùng key với ProductAdapter
+            i.putExtra("product_id", p.id);
+
+            // ✅ preview để vào nhanh (đỡ thấy trống ảnh/giá lúc chờ API)
+            i.putExtra("preview_name", p.name);
+            i.putExtra("preview_price", p.price);
+            i.putExtra("preview_img", p.imageUrl);
+
+            startActivity(i);
+        });
+        recyclerFlashSale.setAdapter(flashSaleAdapter);
+
+        recyclerFlashSale.setAdapter(flashSaleAdapter);
+
+
+        // Các adapter cũ giữ nguyên (Product model)
         hotAdp       = new ProductAdapter(hotData);
         newAdp       = new ProductAdapter(newData);
         lapAdp       = new ProductAdapter(lapData);
@@ -182,7 +222,6 @@ public class HomeFragment extends Fragment {
         pcAdp        = new ProductAdapter(pcData);
         headPhoneAdp = new ProductAdapter(headPhoneData);
 
-        recyclerFlashSale.setAdapter(flashAdp);
         recyclerProducts.setAdapter(hotAdp);
         recyclerNewProducts.setAdapter(newAdp);
         recyclerLaptops.setAdapter(lapAdp);
@@ -198,7 +237,6 @@ public class HomeFragment extends Fragment {
 
     private void setupHeaderActions() {
         btnCartHeader.setOnClickListener(v -> {
-            // Chuyển sang CartFragment thông qua MainActivity
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).switchToTab(MainActivity.TAB_CART);
             }
@@ -235,9 +273,7 @@ public class HomeFragment extends Fragment {
         View.OnClickListener listener = v -> openSearchWithKeyword(keyword);
         tab.setOnClickListener(listener);
         ImageView img = tab.findViewById(imageViewId);
-        if (img != null) {
-            img.setOnClickListener(listener);
-        }
+        if (img != null) img.setOnClickListener(listener);
     }
 
     private void setupTabQuickSearch() {
@@ -260,7 +296,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<List<ProductDto>> call, Response<List<ProductDto>> res) {
                 if (!res.isSuccessful() || res.body() == null) {
-                    if(getContext()!=null) Toast.makeText(getContext(), "Lỗi API", Toast.LENGTH_SHORT).show();
+                    if (getContext() != null) Toast.makeText(getContext(), "Lỗi API", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 splitIntoSections(res.body());
@@ -268,49 +304,171 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<ProductDto>> call, Throwable t) {
-                if(getContext()!=null) Toast.makeText(getContext(), "Không gọi được API: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                if (getContext() != null) Toast.makeText(getContext(), "Không gọi được API: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void splitIntoSections(List<ProductDto> list) {
-        flashData.clear(); hotData.clear(); newData.clear(); lapData.clear();
-        soundData.clear(); pcData.clear(); headPhoneData.clear();
+        flashSaleDtos.clear();
+        hotData.clear();
+        newData.clear();
+        lapData.clear();
+        soundData.clear();
+        pcData.clear();
+        headPhoneData.clear();
 
+        if (list == null || list.isEmpty()) {
+            flashSaleAdapter.notifyDataSetChanged();
+            hotAdp.notifyDataSetChanged();
+            newAdp.notifyDataSetChanged();
+            lapAdp.notifyDataSetChanged();
+            soundAdp.notifyDataSetChanged();
+            pcAdp.notifyDataSetChanged();
+            headPhoneAdp.notifyDataSetChanged();
+            return;
+        }
+
+        // 1) Sort newest theo id giảm dần (vì chưa có createdAt)
+        List<ProductDto> sortedNew = new ArrayList<>(list);
+        sortedNew.sort((a, b) -> Long.compare(b.id, a.id));
+
+        // 2) FLASH SALE = 10 sản phẩm mới nhất
+        int flashCount = Math.min(10, sortedNew.size());
+        for (int i = 0; i < flashCount; i++) {
+            flashSaleDtos.add(sortedNew.get(i));
+        }
+
+        // 3) NEW PRODUCTS = 8 sản phẩm tiếp theo sau flash sale
+        int idxStart = flashCount;
+        int idxEnd = Math.min(idxStart + 8, sortedNew.size());
+        for (int i = idxStart; i < idxEnd; i++) {
+            ProductDto d = sortedNew.get(i);
+            newData.add(new Product(d.id, d.name, vnd(d.price), d.imageUrl));
+        }
+
+        // 4) HOT PRODUCTS = top 10 theo giá cao (tạm coi “bán chạy”)
+        List<ProductDto> sortedByPrice = new ArrayList<>(list);
+        sortedByPrice.sort((a, b) -> Long.compare(b.price, a.price));
+        int hotCount = Math.min(10, sortedByPrice.size());
+        for (int i = 0; i < hotCount; i++) {
+            ProductDto d = sortedByPrice.get(i);
+            hotData.add(new Product(d.id, d.name, vnd(d.price), d.imageUrl));
+        }
+
+        // 5) Phân loại category theo keyword (giới hạn 10/item để UI gọn)
         for (ProductDto d : list) {
             String name = d.name != null ? d.name : "";
             String brand = d.brand != null ? d.brand : "";
             String key = (name + " " + brand).toLowerCase(Locale.ROOT);
+
             Product ui = new Product(d.id, d.name, vnd(d.price), d.imageUrl);
 
-            if (key.contains("laptop") || key.contains("notebook") || key.contains("macbook")) { lapData.add(ui); continue; }
-            if (key.contains("tai nghe") || key.contains("headset")) { headPhoneData.add(ui); continue; }
-            if (key.contains("loa") || key.contains("speaker")) { soundData.add(ui); continue; }
-            if (key.contains("pc") || key.contains("case")) { pcData.add(ui); continue; }
-            if (d.price > 0 && d.price <= 1_500_000) { flashData.add(ui); }
-            if (newData.size() < 8) newData.add(ui);
-            if (brand.equalsIgnoreCase("Intel") || brand.equalsIgnoreCase("AMD") || brand.equalsIgnoreCase("ASUS") || brand.equalsIgnoreCase("MSI") || brand.equalsIgnoreCase("Samsung") || brand.equalsIgnoreCase("Kingston")) { hotData.add(ui); }
+            if (isLaptop(key)) {
+                if (lapData.size() < 10) lapData.add(ui);
+                continue;
+            }
+            if (isHeadphone(key)) {
+                if (headPhoneData.size() < 10) headPhoneData.add(ui);
+                continue;
+            }
+            if (isSpeaker(key)) {
+                if (soundData.size() < 10) soundData.add(ui);
+                continue;
+            }
+            if (isPC(key)) {
+                if (pcData.size() < 10) pcData.add(ui);
+            }
         }
 
-        flashAdp.notifyDataSetChanged(); hotAdp.notifyDataSetChanged(); newAdp.notifyDataSetChanged();
-        lapAdp.notifyDataSetChanged(); soundAdp.notifyDataSetChanged(); pcAdp.notifyDataSetChanged();
+        // Notify all
+        flashSaleAdapter.notifyDataSetChanged();
+        hotAdp.notifyDataSetChanged();
+        newAdp.notifyDataSetChanged();
+        lapAdp.notifyDataSetChanged();
+        soundAdp.notifyDataSetChanged();
+        pcAdp.notifyDataSetChanged();
         headPhoneAdp.notifyDataSetChanged();
+    }
+
+    private boolean isLaptop(String key) {
+        return key.contains("laptop") || key.contains("notebook") || key.contains("macbook")
+                || key.contains("thinkpad") || key.contains("vivobook") || key.contains("ideapad");
+    }
+
+    private boolean isHeadphone(String key) {
+        return key.contains("tai nghe") || key.contains("headphone") || key.contains("headset")
+                || key.contains("earbuds") || key.contains("airpods");
+    }
+
+    private boolean isSpeaker(String key) {
+        return key.contains("loa") || key.contains("speaker") || key.contains("soundbar");
+    }
+
+    private boolean isPC(String key) {
+        return key.contains("pc ") || key.contains(" pc") || key.contains("desktop")
+                || key.contains("case") || key.contains("máy tính bàn");
     }
 
     private String vnd(long price) {
         return NumberFormat.getInstance(new Locale("vi", "VN")).format(price) + " đ";
     }
+    private String formatCountdown(long ms) {
+        long totalSec = ms / 1000;
+        long min = totalSec / 60;
+        long sec = totalSec % 60;
+        return String.format(Locale.getDefault(), "%02d:%02d", min, sec);
+    }
+
+    private void startFlashCountdown(long startMs) {
+        stopFlashCountdown();
+
+        flashRemainMs = startMs;
+        if (tvCountdown != null) tvCountdown.setText(formatCountdown(flashRemainMs));
+
+        flashTimer = new CountDownTimer(flashRemainMs, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                flashRemainMs = millisUntilFinished;
+                if (tvCountdown != null) tvCountdown.setText(formatCountdown(flashRemainMs));
+            }
+
+            @Override
+            public void onFinish() {
+                flashRemainMs = 0;
+                if (tvCountdown != null) tvCountdown.setText("00:00");
+
+                // ✅ tuỳ chọn: reset vòng mới
+                startFlashCountdown(FLASH_DURATION_MS);
+
+                // ✅ tuỳ chọn: reload flash sale khi hết giờ
+                // loadProducts();
+            }
+        }.start();
+    }
+
+    private void stopFlashCountdown() {
+        if (flashTimer != null) {
+            flashTimer.cancel();
+            flashTimer = null;
+        }
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
         updateWelcomeMessage();
         bannerHandler.postDelayed(bannerRunnable, 4000);
+        startFlashCountdown(flashRemainMs <= 0 ? FLASH_DURATION_MS : flashRemainMs);
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         bannerHandler.removeCallbacks(bannerRunnable);
+        stopFlashCountdown();
     }
+
 }
