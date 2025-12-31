@@ -293,4 +293,7 @@ public interface ApiService {
 
     @PATCH("api/user/orders/{orderId}/cancel")
     Call<Void> cancelOrder(@Path("orderId") long orderId);
+
+    @GET("/api/user/orders/{id}/items")
+    Call<List<OrderDetailItemDto>> getUserOrderItems(@Path("id") long orderId);
 }

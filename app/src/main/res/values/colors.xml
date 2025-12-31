@@ -5,6 +5,11 @@
     <color name="text_gray">#888888</color>
     <color name="background_light">#FFFFFF</color>
     <color name="border_light">#E5E7EB</color>
+    <color name="orange">#FF9800</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <color name="gray">#9E9E9E</color>
+
     <!-- New colors for address feature -->
     <color name="blue_500">#3B82F6</color>
     <color name="gray_300">#D1D5DB</color>

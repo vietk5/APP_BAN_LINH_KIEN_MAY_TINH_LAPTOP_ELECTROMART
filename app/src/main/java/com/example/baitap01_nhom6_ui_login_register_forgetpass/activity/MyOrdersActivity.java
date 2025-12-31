@@ -1,5 +1,6 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -218,12 +219,13 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
 
     @Override
     public void onViewDetailClick(Order order) {
-        // Chuyển đến trang chi tiết đơn hàng
-        // Intent intent = new Intent(this, OrderDetailActivity.class);
-        // intent.putExtra("orderId", order.getOrderId());
-        // startActivity(intent);
-
-        Toast.makeText(this, "Xem chi tiết đơn #" + order.getOrderId(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, OrderDetailActivity.class);
+        intent.putExtra("orderId", Long.parseLong(order.getOrderId()));
+        intent.putExtra("status", order.getStatus());
+        intent.putExtra("createdAt", order.getCreatedAt());
+        intent.putExtra("paymentMethod", order.getPaymentMethod());
+        intent.putExtra("totalPrice", order.getTotalPrice());
+        startActivity(intent);
     }
 
     @Override
