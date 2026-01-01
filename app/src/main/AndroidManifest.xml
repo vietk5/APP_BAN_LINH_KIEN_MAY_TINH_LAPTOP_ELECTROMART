@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
 
     <application
         android:allowBackup="true"
@@ -16,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaiTap01_Nhom6_UI_login_register_forgetpass"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".activity.FullScreenImageActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.OrderDetailActivity"
             android:exported="false" />
@@ -109,11 +115,11 @@
         <activity
             android:name=".activity.AddressListActivity"
             android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".activity.MainActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".activity.MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.FirstPage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
