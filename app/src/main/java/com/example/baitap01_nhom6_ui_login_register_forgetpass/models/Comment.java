@@ -9,6 +9,7 @@ public class Comment {
     private String content;
     private int rating;
     private String createdAt;
+    private String imageUrl;
 
     public Comment() {}
 
@@ -25,6 +26,7 @@ public class Comment {
     public String getContent() { return content; }
     public int getRating() { return rating; }
     public String getCreatedAt() { return createdAt; }
+    public String getImageUrl() { return imageUrl; }
 
     public void setId(Long id) { this.id = id; }
     public void setProductId(Long productId) { this.productId = productId; }
@@ -32,4 +34,5 @@ public class Comment {
     public void setContent(String content) { this.content = content; }
     public void setRating(int rating) { this.rating = rating; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
