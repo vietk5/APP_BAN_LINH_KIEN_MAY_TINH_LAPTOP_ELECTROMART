@@ -16,6 +16,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinRe
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinResultResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.SpinStatusResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UpdateProfileRequest;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UploadImageResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserLoginRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.UserRegisterRequest;
@@ -37,13 +38,17 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.Vo
 
 
 import java.util.List;
+
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -173,6 +178,11 @@ public interface ApiService {
 
     @POST("api/comments")
     Call<Comment> postComment(@Body Comment comment);
+
+    @Multipart
+    @POST("api/comments/upload")
+    Call<UploadImageResponse> uploadCommentImage(@Part MultipartBody.Part image);
+
     @GET("api/products/{id}")
     Call<ProductDto> getProductById(@Path("id") long id);
     // lâys dữ liệu tỷ lệ rate
