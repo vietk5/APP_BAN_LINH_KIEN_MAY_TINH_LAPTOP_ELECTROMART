@@ -1,14 +1,18 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.activity.FullScreenImageActivity;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
 
 import java.util.List;
@@ -37,6 +41,25 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
         h.tvContent.setText(c.getContent());
         h.tvRating.setText("★ " + c.getRating());
         h.tvDate.setText(c.getCreatedAt());
+
+        if (c.getImageUrl() != null && !c.getImageUrl().isEmpty()) {
+            h.ivCommentImage.setVisibility(View.VISIBLE);
+
+            // Chỉ cần tải ảnh vào, kích thước đã được XML xử lý
+            Glide.with(h.itemView.getContext())
+                    .load(c.getImageUrl())
+                    .into(h.ivCommentImage);
+
+
+            h.ivCommentImage.setOnClickListener(v -> {
+                Intent intent = new Intent(h.itemView.getContext(), FullScreenImageActivity.class);
+                intent.putExtra("image_url", c.getImageUrl());
+                h.itemView.getContext().startActivity(intent);
+            });
+
+        } else {
+            h.ivCommentImage.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -46,6 +69,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvUsername, tvContent, tvRating, tvDate;
+        ImageView ivCommentImage;
 
         public VH(@NonNull View v) {
             super(v);
@@ -53,6 +77,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
             tvContent = v.findViewById(R.id.cmtContent);
             tvRating = v.findViewById(R.id.cmtRating);
             tvDate = v.findViewById(R.id.cmtDate);
+            ivCommentImage = v.findViewById(R.id.cmtImage);
         }
     }
 }
