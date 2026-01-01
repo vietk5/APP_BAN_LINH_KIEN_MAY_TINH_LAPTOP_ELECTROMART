@@ -1,41 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="#FFFFFF"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/cmtUsername"
-        android:text="Lê Trung Trực"
-        android:textStyle="bold"
-        android:textSize="15sp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="Lê Trung Trực"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/cmtRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="★ 5"
         android:textColor="#FF9800"
-        android:textSize="14sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/cmtContent"
-        android:text="Sản phẩm rất ok nha shop!"
-        android:textSize="15sp"
-        android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Sản phẩm rất ok nha shop!"
+        android:textSize="15sp" />
+
+    <!-- ImageView với kích thước cố định -->
+    <ImageView
+        android:id="@+id/cmtImage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/cmtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:text="2 ngày trước"
         android:textColor="#777"
-        android:textSize="13sp"
-        android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textSize="13sp" />
 
 </LinearLayout>
