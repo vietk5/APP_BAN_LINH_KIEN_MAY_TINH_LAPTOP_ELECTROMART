@@ -36,6 +36,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- KHUNG XEM TRƯỚC ẢNH ĐÃ CHỌN -->
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:id="@+id/ivSelectedCommentImage"
+            android:layout_width="80dp" 
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone" 
+            android:background="#eee" />
+
+        <ImageButton
+            android:id="@+id/ibRemoveImage"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_gravity="top|end"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+    </FrameLayout>
+
     <RatingBar
         android:id="@+id/ratingBar"
         android:layout_width="wrap_content"
@@ -47,11 +72,22 @@
         android:scaleX="0.9"
         android:scaleY="0.9" />
 
+    <!-- KHUNG NHẬP BÌNH LUẬN -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp">
+
+        <!-- Nút thêm ảnh được chuyển xuống đây -->
+        <ImageButton
+            android:id="@+id/btnAddImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:minHeight="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <EditText
             android:id="@+id/edtComment"
