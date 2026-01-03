@@ -11,14 +11,14 @@ public class CheckoutRequest implements Serializable {
     private String receiverAddress;
     private String paymentMethod;
     private String voucherCode;
-    private List<Long> productIds; // danh sách productId trong đơn
+    private List<CheckoutItem> product; // danh sách productId trong đơn
 
     public CheckoutRequest() {
     }
 
     public CheckoutRequest(int isBuyNow, int userId, String receiverName, String receiverPhone,
                            String receiverAddress, String paymentMethod,
-                           String voucherCode, List<Long> productIds) {
+                           String voucherCode, List<CheckoutItem> product) {
         this.isBuyNow = isBuyNow;
         this.userId = userId;
         this.receiverName = receiverName;
@@ -26,7 +26,7 @@ public class CheckoutRequest implements Serializable {
         this.receiverAddress = receiverAddress;
         this.paymentMethod = paymentMethod;
         this.voucherCode = voucherCode;
-        this.productIds = productIds;
+        this.product = product;
     }
 
     // getter/setter
@@ -84,11 +84,11 @@ public class CheckoutRequest implements Serializable {
         this.voucherCode = voucherCode;
     }
 
-    public List<Long> getProductIds() {
-        return productIds;
+    public List<CheckoutItem> getProductIds() {
+        return product;
     }
 
-    public void setProductIds(List<Long> productIds) {
-        this.productIds = productIds;
+    public void setProductIds(List<CheckoutItem> productIds) {
+        this.product = productIds;
     }
 }

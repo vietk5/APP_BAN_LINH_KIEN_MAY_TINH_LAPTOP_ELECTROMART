@@ -21,6 +21,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.MyOrdersAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Order;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.OrderProduct;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutItem;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailItemDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
@@ -230,13 +231,43 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
 
     @Override
     public void onReorderClick(Order order) {
-        // Thêm lại sản phẩm vào giỏ hàng
-        Toast.makeText(this, "Đã thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+        ApiClient.get().getUserOrderItems(Long.parseLong(order.getOrderId()))
+                .enqueue(new retrofit2.Callback<List<OrderDetailItemDto>>() {
+                    @Override
+                    public void onResponse(Call<List<OrderDetailItemDto>> call,
+                                           retrofit2.Response<List<OrderDetailItemDto>> response) {
 
-        // TODO: Thêm logic thêm vào giỏ hàng
-        // for (OrderProduct product : order.getProducts()) {
-        //     cartManager.addToCart(product);
-        // }
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
+
+                            for (OrderDetailItemDto dto : response.body()) {
+                                CheckoutItem item = new CheckoutItem(
+                                        dto.getProductId(),
+                                        dto.getProductName(),
+                                        dto.getImageUrl(),
+                                        dto.getDonGia(),
+                                        dto.getSoLuong()
+                                );
+                                checkoutItems.add(item);
+                            }
+
+                            Intent intent = new Intent(MyOrdersActivity.this,
+                                    CheckoutActivity.class);
+                            intent.putExtra("reorder_items", checkoutItems);
+                            intent.putExtra("isReorder", true);
+                            intent.putExtra("isBuyNow", 1);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<OrderDetailItemDto>> call, Throwable t) {
+                        Toast.makeText(MyOrdersActivity.this,
+                                "Không thể mua lại đơn hàng",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
     private Order mapDtoToOrder(OrderDetailDto dto) {
         if (dto == null) {

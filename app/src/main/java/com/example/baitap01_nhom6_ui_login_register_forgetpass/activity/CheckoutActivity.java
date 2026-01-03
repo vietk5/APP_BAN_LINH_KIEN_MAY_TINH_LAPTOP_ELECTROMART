@@ -70,6 +70,8 @@ public class CheckoutActivity extends AppCompatActivity
     // debounce khi user sửa code / đổi quantity
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable debounceRunnable;
+    private boolean isReorder;
+    private ArrayList<CheckoutItem> checkoutItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,15 +122,29 @@ public class CheckoutActivity extends AppCompatActivity
 
     @SuppressWarnings("unchecked")
     private void readIntentData() {
-        ArrayList<CheckoutItem> fromIntent =
-                (ArrayList<CheckoutItem>) getIntent().getSerializableExtra("items");
-        if (fromIntent != null) {
-            items.clear();
-            items.addAll(fromIntent);
+        Intent intent = getIntent();
+
+        isReorder = intent.getBooleanExtra("isReorder", false);
+
+        ArrayList<CheckoutItem> reorderItems =
+                (ArrayList<CheckoutItem>) intent.getSerializableExtra("reorder_items");
+
+        ArrayList<CheckoutItem> normalItems =
+                (ArrayList<CheckoutItem>) intent.getSerializableExtra("items");
+
+        items.clear();
+
+        if (isReorder && reorderItems != null && !reorderItems.isEmpty()) {
+            items.addAll(reorderItems);
+
+        } else if (!isReorder && normalItems != null && !normalItems.isEmpty()) {
+            items.addAll(normalItems);
         }
 
         if (items.isEmpty()) {
-            Toast.makeText(this, "Không có sản phẩm để thanh toán", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                    "Không có sản phẩm để thanh toán",
+                    Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -247,7 +263,7 @@ public class CheckoutActivity extends AppCompatActivity
                     address,
                     paymentMethod,
                     voucherCode,
-                    productIds
+                    items
             );
 
             long subtotal = getSubtotal();

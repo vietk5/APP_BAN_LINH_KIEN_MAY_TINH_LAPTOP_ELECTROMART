@@ -166,7 +166,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
             Intent intent = new Intent(getContext(), CheckoutActivity.class);
             intent.putExtra("items", selectedItems);
-            checkoutLauncher.launch(intent);
+//            checkoutLauncher.launch(intent);
+            startActivity(intent);
         });
     }
 
