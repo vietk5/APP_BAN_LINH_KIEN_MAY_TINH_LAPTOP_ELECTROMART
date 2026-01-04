@@ -49,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
         // Mặc định load Home
         loadFragment(new HomeFragment());
         updateBottomNavState(btnHome);
+
+        // Xử lý điều hướng từ EmptyCartActivity
+//        boolean goHome = getIntent().getBooleanExtra("go_home", false);
+//        if (goHome) {
+//            loadFragment(new HomeFragment());
+//            updateBottomNavState(btnHome);
+//        }
     }
 
     private void initBottomNav() {

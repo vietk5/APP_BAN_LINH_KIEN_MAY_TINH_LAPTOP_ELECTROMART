@@ -62,6 +62,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
     private ApiService apiService;
     private SharedPrefManager sharedPrefManager;
     private int userId;
+    private boolean isEmptyCartOpened = false;
+
 
     private ActivityResultLauncher<Intent> checkoutLauncher;
 
@@ -246,6 +248,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
     }
 
     private void goToEmptyCart() {
+        if (isEmptyCartOpened || getContext() == null) return;
+        isEmptyCartOpened = true;
         Intent intent = new Intent(getContext(), EmptyCartActivity.class);
         startActivity(intent);
     }

@@ -24,7 +24,9 @@ public class EmptyCartActivity extends AppCompatActivity {
         btnShopNow = findViewById(R.id.btn_shop_now);
         // 2. Thiết lập OnClickListener cho Button
         btnShopNow.setOnClickListener(v -> {
-            Intent intent = new Intent(EmptyCartActivity.this, HomeFragment.class);
+            Intent intent = new Intent(EmptyCartActivity.this, MainActivity.class);
+            intent.putExtra("go_home", true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         });

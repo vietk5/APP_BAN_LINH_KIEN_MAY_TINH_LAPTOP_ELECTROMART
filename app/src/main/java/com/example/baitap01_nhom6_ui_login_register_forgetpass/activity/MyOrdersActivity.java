@@ -232,42 +232,42 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
     @Override
     public void onReorderClick(Order order) {
         ApiClient.get().getUserOrderItems(Long.parseLong(order.getOrderId()))
-                .enqueue(new retrofit2.Callback<List<OrderDetailItemDto>>() {
-                    @Override
-                    public void onResponse(Call<List<OrderDetailItemDto>> call,
-                                           retrofit2.Response<List<OrderDetailItemDto>> response) {
+            .enqueue(new retrofit2.Callback<List<OrderDetailItemDto>>() {
+                @Override
+                public void onResponse(Call<List<OrderDetailItemDto>> call,
+                                       retrofit2.Response<List<OrderDetailItemDto>> response) {
 
-                        if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful() && response.body() != null) {
 
-                            ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
+                        ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
 
-                            for (OrderDetailItemDto dto : response.body()) {
-                                CheckoutItem item = new CheckoutItem(
-                                        dto.getProductId(),
-                                        dto.getProductName(),
-                                        dto.getImageUrl(),
-                                        dto.getDonGia(),
-                                        dto.getSoLuong()
-                                );
-                                checkoutItems.add(item);
-                            }
-
-                            Intent intent = new Intent(MyOrdersActivity.this,
-                                    CheckoutActivity.class);
-                            intent.putExtra("reorder_items", checkoutItems);
-                            intent.putExtra("isReorder", true);
-                            intent.putExtra("isBuyNow", 1);
-                            startActivity(intent);
+                        for (OrderDetailItemDto dto : response.body()) {
+                            CheckoutItem item = new CheckoutItem(
+                                    dto.getProductId(),
+                                    dto.getProductName(),
+                                    dto.getImageUrl(),
+                                    dto.getDonGia(),
+                                    dto.getSoLuong()
+                            );
+                            checkoutItems.add(item);
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<List<OrderDetailItemDto>> call, Throwable t) {
-                        Toast.makeText(MyOrdersActivity.this,
-                                "Không thể mua lại đơn hàng",
-                                Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MyOrdersActivity.this,
+                                CheckoutActivity.class);
+                        intent.putExtra("reorder_items", checkoutItems);
+                        intent.putExtra("isReorder", true);
+                        intent.putExtra("isBuyNow", 1);
+                        startActivity(intent);
                     }
-                });
+                }
+
+                @Override
+                public void onFailure(Call<List<OrderDetailItemDto>> call, Throwable t) {
+                    Toast.makeText(MyOrdersActivity.this,
+                            "Không thể mua lại đơn hàng",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
     }
     private Order mapDtoToOrder(OrderDetailDto dto) {
         if (dto == null) {
