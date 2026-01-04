@@ -17,6 +17,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.CartFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.CategoryFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.HomeFragment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.LoadingFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.PcBuilderFragment;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.fragment.ProfileFragment;
 
@@ -85,13 +86,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnCart.setOnClickListener(v -> {
-            loadFragment(new CartFragment());
+            loadFragment(new LoadingFragment());
             updateBottomNavState(btnCart);
+
+            new android.os.Handler(android.os.Looper.getMainLooper())
+                    .postDelayed(() -> {
+                        loadFragment(new CartFragment());
+                    }, 5000);
         });
 
         btnUser.setOnClickListener(v -> {
-            loadFragment(new ProfileFragment());
+            loadFragment(new LoadingFragment());
             updateBottomNavState(btnUser);
+
+            new android.os.Handler(android.os.Looper.getMainLooper())
+                    .postDelayed(() -> {
+                        loadFragment(new ProfileFragment());
+                    }, 5000);
         });
     }
 
