@@ -16,14 +16,13 @@ public class OrderDetailDto implements Serializable {
 
     @SerializedName("trangThai")
     private String trangThai;
-    @SerializedName("customerName")
-    private String customerName;
+    @SerializedName("tenNguoiNhan")
+    private String tenNguoiNhan;
+    @SerializedName("soDienThoaiNhan")
+    private String soDienThoaiNhan;
 
-    @SerializedName("customerEmail")
-    private String customerEmail;
-
-    @SerializedName("customerPhone")
-    private String customerPhone;
+    @SerializedName("diaChiNhan")
+    private String diaChiNhan;
 
     @SerializedName("tongTien")
     private long tongTien;
@@ -53,27 +52,28 @@ public class OrderDetailDto implements Serializable {
 
     public List<OrderDetailItemDto> getItems() { return items; }
     public void setItems(List<OrderDetailItemDto> items) { this.items = items; }
-    public String getCustomerName() {
-        return customerName;
+
+    public String getTenNguoiNhan() {
+        return tenNguoiNhan;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setTenNguoiNhan(String tenNguoiNhan) {
+        this.tenNguoiNhan = tenNguoiNhan;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public String getSoDienThoaiNhan() {
+        return soDienThoaiNhan;
     }
 
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
+    public void setSoDienThoaiNhan(String soDienThoaiNhan) {
+        this.soDienThoaiNhan = soDienThoaiNhan;
     }
 
-    public String getCustomerPhone() {
-        return customerPhone;
+    public String getDiaChiNhan() {
+        return diaChiNhan;
     }
 
-    public void setCustomerPhone(String customerPhone) {
-        this.customerPhone = customerPhone;
+    public void setDiaChiNhan(String diaChiNhan) {
+        this.diaChiNhan = diaChiNhan;
     }
 }

@@ -24,6 +24,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     public interface OnAddressClickListener {
         void onEditClick(Address address);
         void onSetDefaultClick(Address address);
+        void onSelectAddress(Address address);
     }
 
     public AddressAdapter(OnAddressClickListener listener) {
@@ -96,6 +97,13 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
                     listener.onSetDefaultClick(address);
                 }
             });
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onSelectAddress(address);
+                }
+            });
+
         }
     }
 }

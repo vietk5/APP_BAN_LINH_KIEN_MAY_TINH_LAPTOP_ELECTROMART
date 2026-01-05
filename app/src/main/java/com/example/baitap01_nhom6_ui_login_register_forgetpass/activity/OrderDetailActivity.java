@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.OrderDetailAdapter;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.OrderProduct;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailItemDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.remote.ApiClient;
 
@@ -39,7 +40,7 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private OrderDetailAdapter adapter;
     private List<OrderProduct> productList = new ArrayList<>();
-
+    private TextView tvReceiverName, tvReceiverPhone, tvReceiverAddress;
     private long orderId;
 
 
@@ -51,6 +52,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         getIntentData();
+        loadOrderDetail();
         loadOrderItems();
     }
 
@@ -61,6 +63,9 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvPayment = findViewById(R.id.tvPayment);
         tvTotal = findViewById(R.id.tvTotal);
         rcvProducts = findViewById(R.id.rcvProducts);
+        tvReceiverName = findViewById(R.id.tvReceiverName);
+        tvReceiverPhone = findViewById(R.id.tvReceiverPhone);
+        tvReceiverAddress = findViewById(R.id.tvReceiverAddress);
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
             finish();
@@ -171,6 +176,32 @@ public class OrderDetailActivity extends AppCompatActivity {
             default:
                 return "Không xác định";
         }
+    }
+
+    private void loadOrderDetail() {
+        ApiClient.get().getOrderDetail(orderId)
+            .enqueue(new retrofit2.Callback<OrderDetailDto>() {
+                @Override
+                public void onResponse(Call<OrderDetailDto> call,
+                                       retrofit2.Response<OrderDetailDto> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        bindReceiverInfo(response.body());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto> call, Throwable t) {
+                    Toast.makeText(OrderDetailActivity.this,
+                            "Không tải được thông tin người nhận", Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+    private void bindReceiverInfo(
+            com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.OrderDetailDto dto) {
+
+        tvReceiverName.setText("Tên người nhận: " + dto.getTenNguoiNhan());
+        tvReceiverPhone.setText("Số điện thoại: " + dto.getSoDienThoaiNhan());
+        tvReceiverAddress.setText("Địa chỉ: " + dto.getDiaChiNhan());
     }
 
 }

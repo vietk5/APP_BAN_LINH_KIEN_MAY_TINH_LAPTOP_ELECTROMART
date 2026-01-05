@@ -38,11 +38,15 @@ public class AddressListActivity extends AppCompatActivity implements AddressAda
     private AddressAdapter adapter;
     private ApiService apiService;
     private SharedPrefManager sharedPref;
+    private boolean isSelectMode;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_address_list);
+
+        isSelectMode = getIntent().getBooleanExtra("select_mode", false);
 
         MaterialToolbar toolbar = findViewById(R.id.userToolbar);
         AdminNavHelper.setupToolbar(this, toolbar, "Quản lý sổ địa chỉ");
@@ -150,4 +154,15 @@ public class AddressListActivity extends AppCompatActivity implements AddressAda
             }
         }
     }
+
+    @Override
+    public void onSelectAddress(Address address) {
+        if (!isSelectMode) return;
+
+        Intent data = new Intent();
+        data.putExtra("selected_address", address);
+        setResult(RESULT_OK, data);
+        finish();
+    }
+
 }

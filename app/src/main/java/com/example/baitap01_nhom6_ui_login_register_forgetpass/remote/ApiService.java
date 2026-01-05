@@ -306,4 +306,7 @@ public interface ApiService {
 
     @GET("/api/user/orders/{id}/items")
     Call<List<OrderDetailItemDto>> getUserOrderItems(@Path("id") long orderId);
+
+    @GET("/api/user/orders/{orderId}")
+    Call<OrderDetailDto> getOrderDetail(@Path("orderId") long orderId);
 }

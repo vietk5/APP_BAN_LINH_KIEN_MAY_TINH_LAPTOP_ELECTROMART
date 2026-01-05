@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.R;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.adapters.CheckoutItemAdapter;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.Address;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutItem;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.CheckoutRequest;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.ApplyVoucherRequest;
@@ -72,6 +74,10 @@ public class CheckoutActivity extends AppCompatActivity
     private Runnable debounceRunnable;
     private boolean isReorder;
     private ArrayList<CheckoutItem> checkoutItems;
+    private static final int REQUEST_SELECT_ADDRESS = 200;
+    private LinearLayout layoutSelectAddress;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +116,8 @@ public class CheckoutActivity extends AppCompatActivity
 
         rgPayment    = findViewById(R.id.rgPayment);
         btnPlaceOrder= findViewById(R.id.btnPlaceOrder);
+
+        layoutSelectAddress = findViewById(R.id.layoutSelectAddress);
     }
 
     private void applyWindowInsets() {
@@ -193,6 +201,12 @@ public class CheckoutActivity extends AppCompatActivity
     }
 
     private void setupEvents() {
+        // chọn địa chỉ
+        layoutSelectAddress.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddressListActivity.class);
+            intent.putExtra("select_mode", true);
+            startActivityForResult(intent, REQUEST_SELECT_ADDRESS);
+        });
 
         // nút apply
         btnApplyVoucher.setOnClickListener(v -> {
@@ -448,4 +462,23 @@ public class CheckoutActivity extends AppCompatActivity
         @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
         @Override public void afterTextChanged(android.text.Editable s) {}
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_SELECT_ADDRESS && resultCode == RESULT_OK) {
+            Address address = (Address) data.getSerializableExtra("selected_address");
+            if (address != null) {
+                fillAddress(address);
+            }
+        }
+    }
+
+    private void fillAddress(Address a) {
+        tvReceiverName.setText(a.getTenNguoiNhan());
+        edtReceiverPhone.setText(a.getSoDienThoai());
+        edtReceiverAddress.setText(a.getFullAddress());
+    }
+
 }
