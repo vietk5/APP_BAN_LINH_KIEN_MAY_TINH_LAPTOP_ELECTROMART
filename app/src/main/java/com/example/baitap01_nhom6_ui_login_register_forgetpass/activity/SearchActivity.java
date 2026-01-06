@@ -104,7 +104,7 @@ public class SearchActivity extends AppCompatActivity {
         String keyUpper = keyword.toUpperCase();
         int selectionIndex = 0;
 
-        if (keyUpper.contains("CPU") || keyUpper.contains("MAIN") || keyUpper.contains("RAM") || keyUpper.contains("VGA") || keyUpper.contains("SSD") || keyUpper.contains("HDD") || keyUpper.contains("PSU") || keyUpper.contains("CASE")) {
+        if (keyUpper.contains("CPU") || keyUpper.contains("MAIN") || keyUpper.contains("RAM") || keyUpper.contains("VGA") || keyUpper.contains("SSD") || keyUpper.contains("HDD") || keyUpper.contains("Nguồn") || keyUpper.contains("CASE")) {
             // Các linh kiện này thường nằm trong mục "PC" hoặc "Linh kiện" (nếu có)
             // Ở đây giả sử bạn xếp chung vào PC hoặc tìm cách filter khác.
             // Tạm thời để "Tất cả" và để text search làm việc.
@@ -312,6 +312,13 @@ public class SearchActivity extends AppCompatActivity {
             case "Bàn phím": return keyLower.contains("bàn phím") || keyLower.contains("keyboard");
             case "Chuột": return keyLower.contains("chuột") || keyLower.contains("mouse");
             case "Loa": return keyLower.contains("loa") || keyLower.contains("speaker");
+            case "Card màn hình": return keyLower.contains("vga") || keyLower.contains("card màn hình");
+            case "SSD": return keyLower.contains("ssd");
+            case "HDD": return keyLower.contains("hdd");
+            case "RAM": return keyLower.contains("ram");
+            case "CPU": return keyLower.contains("cpu");
+            case "case": return keyLower.contains("CASE");
+            case "PSU": return keyLower.contains("Nguồn");
             default: return true;
         }
     }

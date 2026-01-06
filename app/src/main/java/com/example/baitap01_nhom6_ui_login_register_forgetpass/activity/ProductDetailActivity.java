@@ -10,11 +10,13 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,15 +63,20 @@ import retrofit2.Response;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
-    // ... (Các biến cũ)
+    // ===== Loading =====
+    private FrameLayout loadingOverlay;
+    private ProgressBar progressLoading;
+    private ScrollView scrollContent;
+    private int pendingRequests = 0;
+
+    // ===== Upload comment image =====
     private ImageView ivSelectedCommentImage;
     private ImageButton btnAddImage, ibRemoveImage;
-    private Uri selectedImageUri; // Lưu URI của ảnh đã chọn
-
-    // ActivityResultLauncher để xử lý quyền và chọn ảnh
+    private Uri selectedImageUri;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
+    // ===== API + Views =====
     private ApiService api;
     private ImageView img;
     private TextView txtName, txtPrice, txtDesc, txtSpecs;
@@ -79,13 +86,12 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Product currentProduct;
     private SharedPrefManager pref;
 
-    private List<Comment> commentList = new ArrayList<>();
+    private final List<Comment> commentList = new ArrayList<>();
     private EditText edtComment;
     private Button btnSendComment, btnBuyNow, btnAddToCart;
     private RatingBar ratingBar;
     private TextView txtRatingAvg;
     private LinearLayout ratingBars;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,13 +106,21 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         api = ApiClient.get();
         pref = new SharedPrefManager(this);
+
         productId = getIntent().getLongExtra("product_id", -1);
+        if (productId <= 0) {
+            Toast.makeText(this, "Thiếu product_id", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         initViews();
-        initImagePickerLaunchers(); // Khởi tạo các launcher
+        initImagePickerLaunchers();
 
-        // ... (Code cũ)
+        // Bật loading ngay khi mở trang
+        showLoading(true);
 
+        // Load dữ liệu (4 request)
         loadProductDetail();
         loadRelatedProducts();
         loadComments();
@@ -120,7 +134,11 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        // ... (ánh xạ các view cũ)
+        // Content + loading
+        scrollContent = findViewById(R.id.scrollContent);
+        loadingOverlay = findViewById(R.id.loadingOverlay);
+        progressLoading = findViewById(R.id.progressLoading);
+
         img = findViewById(R.id.imgProduct);
         txtName = findViewById(R.id.txtName);
         txtPrice = findViewById(R.id.txtPrice);
@@ -137,49 +155,61 @@ public class ProductDetailActivity extends AppCompatActivity {
         btnSendComment = findViewById(R.id.btnSendComment);
         btnBuyNow = findViewById(R.id.btnBuyNow);
         btnAddToCart = findViewById(R.id.btnAddToCart);
+
         ratingBar = findViewById(R.id.ratingBar);
         txtRatingAvg = findViewById(R.id.txtRatingAvg);
-        ratingBars   = findViewById(R.id.ratingBars);
+        ratingBars = findViewById(R.id.ratingBars);
 
-        // Ánh xạ các view mới cho upload ảnh
         ivSelectedCommentImage = findViewById(R.id.ivSelectedCommentImage);
         btnAddImage = findViewById(R.id.btnAddImage);
         ibRemoveImage = findViewById(R.id.ibRemoveImage);
     }
 
-    // ================== LOGIC CHỌN VÀ UPLOAD ẢNH ==================
+    // ===== Loading helpers =====
+    private void showLoading(boolean show) {
+        if (loadingOverlay == null || scrollContent == null) return;
+        loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+        scrollContent.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
 
+    private void startRequest() {
+        pendingRequests++;
+        showLoading(true);
+    }
+
+    private void finishRequest() {
+        pendingRequests = Math.max(0, pendingRequests - 1);
+        if (pendingRequests == 0) {
+            showLoading(false);
+        }
+    }
+
+    // ================== IMAGE PICKER ==================
     private void initImagePickerLaunchers() {
-        // Launcher để yêu cầu quyền
-        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-            if (isGranted) {
-                openGallery();
-            } else {
-                Toast.makeText(this, "Bạn cần cấp quyền truy cập để chọn ảnh", Toast.LENGTH_SHORT).show();
-            }
-        });
+        requestPermissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                    if (isGranted) openGallery();
+                    else Toast.makeText(this, "Bạn cần cấp quyền truy cập để chọn ảnh", Toast.LENGTH_SHORT).show();
+                });
 
-        // Launcher để mở thư viện ảnh
-        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                selectedImageUri = result.getData().getData();
-                if (selectedImageUri != null) {
-                    ivSelectedCommentImage.setImageURI(selectedImageUri);
-                    ivSelectedCommentImage.setVisibility(View.VISIBLE);
-                    ibRemoveImage.setVisibility(View.VISIBLE);
-                    btnAddImage.setVisibility(View.GONE);
-                }
-            }
-        });
+        pickImageLauncher =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        if (selectedImageUri != null) {
+                            ivSelectedCommentImage.setImageURI(selectedImageUri);
+                            ivSelectedCommentImage.setVisibility(View.VISIBLE);
+                            ibRemoveImage.setVisibility(View.VISIBLE);
+                            btnAddImage.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     private void checkPermissionAndOpenGallery() {
-        String permission;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permission = Manifest.permission.READ_MEDIA_IMAGES;
-        } else {
-            permission = Manifest.permission.READ_EXTERNAL_STORAGE;
-        }
+        String permission = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                ? Manifest.permission.READ_MEDIA_IMAGES
+                : Manifest.permission.READ_EXTERNAL_STORAGE;
 
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             openGallery();
@@ -200,8 +230,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         btnAddImage.setVisibility(View.VISIBLE);
     }
 
-    // ================== COMMENT & RATING (ĐÃ CẬP NHẬT) ==================
-
+    // ================== COMMENT & RATING ==================
     private void sendCommentWithImage() {
         if (!pref.isLoggedIn()) {
             showLoginDialog();
@@ -220,13 +249,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Nếu không có ảnh nào được chọn, gửi bình luận như bình thường
-        if (selectedImageUri == null) {
-            postCommentToServer(null); // Gửi với imageUrl là null
-        } else {
-            // Nếu có ảnh, upload ảnh trước
-            uploadImageAndPostComment();
-        }
+        if (selectedImageUri == null) postCommentToServer(null);
+        else uploadImageAndPostComment();
     }
 
     private void uploadImageAndPostComment() {
@@ -236,15 +260,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
 
-        RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(selectedImageUri)), file);
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse(getContentResolver().getType(selectedImageUri)), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
         api.uploadCommentImage(body).enqueue(new Callback<UploadImageResponse>() {
             @Override
-            public void onResponse(@NonNull Call<UploadImageResponse> call, @NonNull Response<UploadImageResponse> response) {
+            public void onResponse(@NonNull Call<UploadImageResponse> call,
+                                   @NonNull Response<UploadImageResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String imageUrl = response.body().getUrl();
-                    postCommentToServer(imageUrl); // Sau khi upload thành công, gửi bình luận với URL ảnh
+                    postCommentToServer(response.body().getUrl());
                 } else {
                     Toast.makeText(ProductDetailActivity.this, "Upload ảnh thất bại", Toast.LENGTH_SHORT).show();
                 }
@@ -262,9 +287,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         int rating = (int) ratingBar.getRating();
 
         Comment comment = new Comment(productId, pref.getName(), content, rating);
-        if (imageUrl != null) {
-            comment.setImageUrl(imageUrl);
-        }
+        if (imageUrl != null) comment.setImageUrl(imageUrl);
 
         api.postComment(comment).enqueue(new Callback<Comment>() {
             @Override
@@ -272,8 +295,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     edtComment.setText("");
                     ratingBar.setRating(0);
-                    removeSelectedImage(); // Xóa ảnh đã chọn sau khi gửi thành công
-                    loadComments(); // Tải lại danh sách bình luận
+                    removeSelectedImage();
+                    loadComments();
                     Toast.makeText(ProductDetailActivity.this, "Đã gửi bình luận", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ProductDetailActivity.this, "Gửi bình luận thất bại", Toast.LENGTH_SHORT).show();
@@ -286,8 +309,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
     }
-
-    // ... (Các phương thức cũ không thay đổi: handleBuyNow, handleAddToCart, loadProductDetail, ...)
 
     private void showLoginDialog() {
         new AlertDialog.Builder(this)
@@ -306,26 +327,31 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void loadRatingSummary() {
+        startRequest();
         api.getRatingSummary(productId).enqueue(new Callback<RatingSummary>() {
             @Override
             public void onResponse(Call<RatingSummary> call, Response<RatingSummary> res) {
-                if (!res.isSuccessful() || res.body() == null) return;
+                try {
+                    if (!res.isSuccessful() || res.body() == null) return;
 
-                RatingSummary s = res.body();
+                    RatingSummary s = res.body();
+                    txtRatingAvg.setText(String.format("%.1f ★", s.avg));
 
-                txtRatingAvg.setText(String.format("%.1f ★", s.avg));
-
-                ratingBars.removeAllViews();
-
-                addRatingRow(5, s.count5, s);
-                addRatingRow(4, s.count4, s);
-                addRatingRow(3, s.count3, s);
-                addRatingRow(2, s.count2, s);
-                addRatingRow(1, s.count1, s);
+                    ratingBars.removeAllViews();
+                    addRatingRow(5, s.count5, s);
+                    addRatingRow(4, s.count4, s);
+                    addRatingRow(3, s.count3, s);
+                    addRatingRow(2, s.count2, s);
+                    addRatingRow(1, s.count1, s);
+                } finally {
+                    finishRequest();
+                }
             }
 
             @Override
-            public void onFailure(Call<RatingSummary> call, Throwable t) {}
+            public void onFailure(Call<RatingSummary> call, Throwable t) {
+                finishRequest();
+            }
         });
     }
 
@@ -347,6 +373,8 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         ratingBars.addView(row);
     }
+
+    // ================== BUY NOW / ADD TO CART ==================
     private void handleBuyNow() {
         if (!pref.isLoggedIn()) {
             showLoginDialog();
@@ -364,27 +392,21 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Chuẩn bị CheckoutItem cho sản phẩm hiện tại
         long priceLong = 0L;
         try {
             priceLong = Long.parseLong(currentProduct.getPrice());
-        } catch (NumberFormatException e) {
-            // nếu lỗi parse thì để 0
-        }
+        } catch (NumberFormatException ignored) {}
 
         ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
-        checkoutItems.add(
-                new CheckoutItem(
-                        currentProduct.getId(),
-                        currentProduct.getName(),
-                        currentProduct.getImageUrl(),
-                        priceLong,
-                        1   // số lượng mặc định
-                )
-        );
+        checkoutItems.add(new CheckoutItem(
+                currentProduct.getId(),
+                currentProduct.getName(),
+                currentProduct.getImageUrl(),
+                priceLong,
+                1
+        ));
 
-        Intent intent =
-                new Intent(ProductDetailActivity.this, CheckoutActivity.class);
+        Intent intent = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
         intent.putExtra("items", checkoutItems);
         intent.putExtra("isBuyNow", 1);
         startActivity(intent);
@@ -414,93 +436,114 @@ public class ProductDetailActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> res) {
                 if (res.isSuccessful()) {
                     CartManager.getInstance().addProduct(currentProduct);
-
-                    Toast.makeText(ProductDetailActivity.this,
-                            "Đã thêm vào giỏ hàng",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProductDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ProductDetailActivity.this,
-                            "Không thể thêm vào giỏ (mã lỗi " + res.code() + ")",
-                            Toast.LENGTH_SHORT).show();
+                            "Không thể thêm vào giỏ (mã lỗi " + res.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(ProductDetailActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // ================== LOAD DATA (4 API calls) ==================
     private void loadProductDetail() {
+        startRequest();
         api.getProductById(productId).enqueue(new Callback<ProductDto>() {
             @Override
             public void onResponse(Call<ProductDto> call, Response<ProductDto> res) {
-                if (!res.isSuccessful() || res.body() == null) return;
+                try {
+                    if (!res.isSuccessful() || res.body() == null) {
+                        Toast.makeText(ProductDetailActivity.this, "Không tải được chi tiết sản phẩm", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                ProductDto p = res.body();
+                    ProductDto p = res.body();
 
-                currentProduct = new Product(
-                        p.getId(),
-                        p.getName(),
-                        String.valueOf(p.getPrice()),
-                        p.getImageUrl()
-                );
+                    currentProduct = new Product(
+                            p.getId(),
+                            p.getName(),
+                            String.valueOf(p.getPrice()),
+                            p.getImageUrl()
+                    );
 
-                txtName.setText(p.getName());
-                txtPrice.setText(PriceFormatter.vnd(p.getPrice()));
-                txtDesc.setText("Hàng mới 100%, bảo hành 24 tháng");
-                txtSpecs.setText(p.getMoTaNgan());
+                    txtName.setText(p.getName());
+                    txtPrice.setText(PriceFormatter.vnd(p.getPrice()));
+                    txtDesc.setText("Hàng mới 100%, bảo hành 24 tháng");
+                    txtSpecs.setText(p.getMoTaNgan());
 
-                Glide.with(ProductDetailActivity.this)
-                        .load(p.getImageUrl())
-                        .into(img);
+                    Glide.with(ProductDetailActivity.this)
+                            .load(p.getImageUrl())
+                            .into(img);
+
+                } finally {
+                    finishRequest();
+                }
             }
 
             @Override
-            public void onFailure(Call<ProductDto> call, Throwable t) {}
+            public void onFailure(Call<ProductDto> call, Throwable t) {
+                Toast.makeText(ProductDetailActivity.this, "Lỗi tải chi tiết: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                finishRequest();
+            }
         });
     }
 
     private void loadRelatedProducts() {
+        startRequest();
         api.getRelated(productId).enqueue(new Callback<List<ProductDto>>() {
             @Override
             public void onResponse(Call<List<ProductDto>> call, Response<List<ProductDto>> res) {
-                if (!res.isSuccessful() || res.body() == null) return;
+                try {
+                    if (!res.isSuccessful() || res.body() == null) return;
 
-                List<Product> list = new ArrayList<>();
-                for (ProductDto dto : res.body()) {
-                    list.add(new Product(
-                            dto.getId(),
-                            dto.getName(),
-                            PriceFormatter.vnd(dto.getPrice()),
-                            dto.getImageUrl()
-                    ));
+                    List<Product> list = new ArrayList<>();
+                    for (ProductDto dto : res.body()) {
+                        list.add(new Product(
+                                dto.getId(),
+                                dto.getName(),
+                                PriceFormatter.vnd(dto.getPrice()),
+                                dto.getImageUrl()
+                        ));
+                    }
+
+                    rvRelated.setAdapter(new ProductAdapter(list));
+                } finally {
+                    finishRequest();
                 }
-
-                rvRelated.setAdapter(new ProductAdapter(list));
             }
 
             @Override
-            public void onFailure(Call<List<ProductDto>> call, Throwable t) {}
+            public void onFailure(Call<List<ProductDto>> call, Throwable t) {
+                finishRequest();
+            }
         });
     }
 
     private void loadComments() {
+        startRequest();
         api.getComments(productId).enqueue(new Callback<List<Comment>>() {
             @Override
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> res) {
-                if (res.isSuccessful() && res.body() != null) {
-                    commentList.clear();
-                    commentList.addAll(res.body());
-                    rvComments.setAdapter(new CommentAdapter(commentList));
+                try {
+                    if (res.isSuccessful() && res.body() != null) {
+                        commentList.clear();
+                        commentList.addAll(res.body());
+                        rvComments.setAdapter(new CommentAdapter(commentList));
+                    }
+                } finally {
+                    finishRequest();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Comment>> call, Throwable t) {}
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
+                finishRequest();
+            }
         });
     }
 }

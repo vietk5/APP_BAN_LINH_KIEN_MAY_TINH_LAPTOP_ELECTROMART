@@ -24,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- IMAGE -->
             <ImageView
                 android:id="@+id/imgProduct"
                 android:layout_width="match_parent"
@@ -32,7 +31,6 @@
                 android:scaleType="centerCrop"
                 android:background="#EEEEEE" />
 
-            <!-- NAME -->
             <TextView
                 android:id="@+id/txtName"
                 android:text="Tên sản phẩm"
@@ -42,7 +40,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- PRICE -->
             <TextView
                 android:id="@+id/txtPrice"
                 android:text="30.500.000 đ"
@@ -53,7 +50,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- SHORT DESCRIPTION -->
             <TextView
                 android:id="@+id/txtShortDesc"
                 android:text="Hàng mới 100%, bảo hành 24 tháng"
@@ -63,17 +59,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- TECHNICAL SPECS -->
             <include layout="@layout/layout_technical_specs" />
-
-            <!-- RELATED PRODUCTS -->
             <include layout="@layout/layout_related_products" />
-
-            <!-- RATING + COMMENTS -->
             <include layout="@layout/layout_rating_reviews" />
-
-
-            <!-- FOOTER -->
             <include layout="@layout/layout_footer_shop" />
 
         </LinearLayout>
@@ -107,7 +95,41 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
-
     </LinearLayout>
+
+    <!-- LOADING OVERLAY (đè lên toàn bộ UI) -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:text="Đang tải dữ liệu..."
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </FrameLayout>
 
 </RelativeLayout>

@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,14 +64,24 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
     private ApiService apiService;
     private SharedPrefManager sharedPrefManager;
     private int userId;
+
     private boolean isEmptyCartOpened = false;
 
-
     private ActivityResultLauncher<Intent> checkoutLauncher;
+
+    // ===== Loading overlay (NEW) =====
+    private FrameLayout loadingOverlay;
+    private ProgressBar progressLoading;
+    private TextView txtLoading;
+
+    // ===== Prevent double loading =====
+    private Call<List<CartItemDto>> cartCall;
+    private boolean isFetchingCart = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         checkoutLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -85,7 +97,9 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_cart, container, false);
     }
 
@@ -101,7 +115,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
         updateSelectAllState();
         updateSummary();
-        fetchCartFromServer();
+
+        fetchCartFromServer(); // có loading
     }
 
     private void initViews(View view) {
@@ -110,6 +125,19 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
         tvSelectedCount = view.findViewById(R.id.tv_selected_count);
         tvTotalPrice = view.findViewById(R.id.tv_total_price);
         btnCheckout = view.findViewById(R.id.btn_checkout);
+
+        // loading overlay
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
+        progressLoading = view.findViewById(R.id.progressLoading);
+        txtLoading = view.findViewById(R.id.txtLoading);
+
+        showLoading(false, null);
+    }
+
+    private void showLoading(boolean show, String message) {
+        if (!isAdded()) return;
+        if (txtLoading != null && message != null) txtLoading.setText(message);
+        if (loadingOverlay != null) loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void initSession() {
@@ -121,6 +149,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
     private void setupRecyclerView() {
         if (getContext() == null) return;
+
         recyclerCart.setLayoutManager(new LinearLayoutManager(getContext()));
         cartAdapter = new CartAdapter(getContext(), cartItems, this, userId);
         recyclerCart.setAdapter(cartAdapter);
@@ -128,18 +157,14 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
     private void setupEvents() {
         checkboxSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            for (CartItem item : cartItems) {
-                item.setSelected(isChecked);
-            }
-            if (!cartItems.isEmpty()) {
-                cartAdapter.notifyItemRangeChanged(0, cartItems.size());
-            }
+            for (CartItem item : cartItems) item.setSelected(isChecked);
+            if (!cartItems.isEmpty()) cartAdapter.notifyItemRangeChanged(0, cartItems.size());
             updateSummary();
             updateSelectAllState();
         });
 
         btnCheckout.setOnClickListener(v -> {
-            if (!sharedPrefManager.isLoggedIn() || userId <= 0) {
+            if (sharedPrefManager == null || !sharedPrefManager.isLoggedIn() || userId <= 0) {
                 Toast.makeText(getContext(), "Vui lòng đăng nhập để thanh toán", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(getContext(), LoginActivity.class));
                 return;
@@ -149,16 +174,15 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
             for (CartItem item : cartItems) {
                 if (!item.isSelected()) continue;
                 try {
-                    long price = Long.parseLong(item.getProduct().getPrice().replaceAll("[^0-9]", "")); // Fix parse price string
-                    CheckoutItem ci = new CheckoutItem(
+                    long price = Long.parseLong(item.getProduct().getPrice().replaceAll("[^0-9]", ""));
+                    selectedItems.add(new CheckoutItem(
                             item.getProduct().getId(),
                             item.getProduct().getName(),
                             item.getProduct().getImageUrl(),
                             price,
                             item.getQuantity()
-                    );
-                    selectedItems.add(ci);
-                } catch (NumberFormatException e) { }
+                    ));
+                } catch (NumberFormatException ignored) {}
             }
 
             if (selectedItems.isEmpty()) {
@@ -168,90 +192,117 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
             Intent intent = new Intent(getContext(), CheckoutActivity.class);
             intent.putExtra("items", selectedItems);
-//            checkoutLauncher.launch(intent);
             startActivity(intent);
+            // hoặc checkoutLauncher.launch(intent) nếu bạn muốn nhận purchased_ids
         });
     }
 
     private void loadCartDataLocal() {
         cartItems = CartManager.getInstance().getCartItems();
-        if (cartItems == null) {
-            cartItems = new ArrayList<>();
-        }
+        if (cartItems == null) cartItems = new ArrayList<>();
     }
 
     private void fetchCartFromServer() {
+        if (!isAdded()) return;
+
         if (userId <= 0) {
             if (cartItems.isEmpty()) goToEmptyCart();
             return;
         }
 
-        apiService.getCart(userId).enqueue(new Callback<List<CartItemDto>>() {
+        // ✅ chặn gọi chồng
+        if (isFetchingCart) return;
+        isFetchingCart = true;
+
+        // ✅ cancel call cũ nếu còn
+        if (cartCall != null && !cartCall.isCanceled()) {
+            cartCall.cancel();
+        }
+
+        showLoading(true, "Đang tải giỏ hàng...");
+
+        cartCall = apiService.getCart(userId);
+        cartCall.enqueue(new Callback<List<CartItemDto>>() {
             @Override
             public void onResponse(Call<List<CartItemDto>> call, Response<List<CartItemDto>> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    if (cartItems.isEmpty()) goToEmptyCart();
-                    return;
-                }
+                try {
+                    if (!isAdded()) return;
 
-                List<CartItemDto> dtoList = response.body();
+                    if (!response.isSuccessful() || response.body() == null) {
+                        if (cartItems.isEmpty()) goToEmptyCart();
+                        return;
+                    }
 
-                // ✅ Nếu server trả rỗng mà local đang có -> GIỮ LOCAL, đừng clear
-                if (dtoList.isEmpty()) {
-                    cartAdapter.notifyDataSetChanged();
+                    List<CartItemDto> dtoList = response.body();
+
+                    // server rỗng -> giữ local
+                    if (dtoList.isEmpty()) {
+                        if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
+                        updateSelectAllState();
+                        updateSummary();
+                        if (cartItems.isEmpty()) goToEmptyCart();
+                        return;
+                    }
+
+                    List<CartItem> newList = new ArrayList<>();
+                    for (CartItemDto dto : dtoList) {
+                        CartItem item = mapDtoToCartItem(dto);
+                        if (item != null) newList.add(item);
+                    }
+
+                    cartItems.clear();
+                    cartItems.addAll(newList);
+
+                    if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
                     updateSelectAllState();
                     updateSummary();
-                    // nếu cả local cũng rỗng thì mới đi empty
+
                     if (cartItems.isEmpty()) goToEmptyCart();
-                    return;
+                } finally {
+                    isFetchingCart = false;
+                    showLoading(false, null);
                 }
-
-                // ✅ Có data server thì mới replace local
-                List<CartItem> newList = new ArrayList<>();
-                for (CartItemDto dto : dtoList) {
-                    CartItem item = mapDtoToCartItem(dto);
-                    if (item != null) newList.add(item);
-                }
-
-                cartItems.clear();
-                cartItems.addAll(newList);
-
-                cartAdapter.notifyDataSetChanged();
-                updateSelectAllState();
-                updateSummary();
-
-                if (cartItems.isEmpty()) goToEmptyCart();
             }
 
             @Override
             public void onFailure(Call<List<CartItemDto>> call, Throwable t) {
-                if (cartItems.isEmpty()) goToEmptyCart();
-                else if (getContext() != null)
-                    Toast.makeText(getContext(),
-                            "Không tải được giỏ hàng từ server, dùng dữ liệu offline.",
-                            Toast.LENGTH_SHORT).show();
+                try {
+                    if (!isAdded()) return;
+
+                    // nếu bị cancel do request mới -> bỏ qua
+                    if (call.isCanceled()) return;
+
+                    if (cartItems.isEmpty()) goToEmptyCart();
+                    else if (getContext() != null) {
+                        Toast.makeText(getContext(),
+                                "Không tải được giỏ hàng từ server, dùng dữ liệu offline.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } finally {
+                    isFetchingCart = false;
+                    showLoading(false, null);
+                }
             }
         });
     }
 
-
     private CartItem mapDtoToCartItem(CartItemDto dto) {
         if (dto == null) return null;
+
         Long productId = dto.getProductId();
         String name = dto.getProductName();
         String imageUrl = dto.getImageUrl();
         BigDecimal unitPrice = dto.getUnitPrice();
         long priceLong = unitPrice != null ? unitPrice.longValue() : 0L;
-        String priceStr = String.valueOf(priceLong);
-        Product p = new Product(productId, name, priceStr, imageUrl);
+
+        Product p = new Product(productId, name, String.valueOf(priceLong), imageUrl);
         return new CartItem(p, dto.getQuantity(), true);
     }
 
     private void goToEmptyCart() {
         if (isEmptyCartOpened || getContext() == null) return;
         isEmptyCartOpened = true;
-        Intent intent = new Intent(getContext(), EmptyCartActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(getContext(), EmptyCartActivity.class));
     }
 
     private void handlePurchasedItems(long[] purchasedIds) {
@@ -264,7 +315,8 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
             Long pid = item.getProduct().getId();
             if (pid != null && purchasedSet.contains(pid)) it.remove();
         }
-        cartAdapter.notifyDataSetChanged();
+
+        if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
 
         if (cartItems.isEmpty()) goToEmptyCart();
         else {
@@ -275,21 +327,18 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
 
     private int getSelectedCount() {
         int count = 0;
-        for (CartItem item : cartItems) {
-            if (item.isSelected()) count++;
-        }
+        for (CartItem item : cartItems) if (item.isSelected()) count++;
         return count;
     }
 
     private long getSelectedTotalPrice() {
         long total = 0;
         for (CartItem item : cartItems) {
-            if (item.isSelected()) {
-                try {
-                    long price = Long.parseLong(item.getProduct().getPrice().replaceAll("[^0-9]", ""));
-                    total += price * item.getQuantity();
-                } catch (NumberFormatException e) { }
-            }
+            if (!item.isSelected()) continue;
+            try {
+                long price = Long.parseLong(item.getProduct().getPrice().replaceAll("[^0-9]", ""));
+                total += price * item.getQuantity();
+            } catch (NumberFormatException ignored) {}
         }
         return total;
     }
@@ -304,11 +353,9 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
     private void updateSelectAllState() {
         boolean allSelected = !cartItems.isEmpty();
         for (CartItem item : cartItems) {
-            if (!item.isSelected()) {
-                allSelected = false;
-                break;
-            }
+            if (!item.isSelected()) { allSelected = false; break; }
         }
+
         checkboxSelectAll.setOnCheckedChangeListener(null);
         checkboxSelectAll.setChecked(allSelected);
         checkboxSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -331,6 +378,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
         updateSummary();
         if (sizeAfterRemove == 0) goToEmptyCart();
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -338,7 +386,16 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartChangeLi
         if (cartAdapter != null) cartAdapter.notifyDataSetChanged();
         updateSelectAllState();
         updateSummary();
+
+        // ✅ gọi lại nhưng không chồng do isFetchingCart + cancel call
         fetchCartFromServer();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // tránh leak + tránh callback về view đã destroy
+        if (cartCall != null) cartCall.cancel();
+        showLoading(false, null);
+    }
 }

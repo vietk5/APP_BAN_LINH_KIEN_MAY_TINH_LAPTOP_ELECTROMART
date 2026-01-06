@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,31 +37,36 @@ import java.util.List;
 import retrofit2.Call;
 
 public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapter.OnOrderClickListener {
+
     private ImageView btnBack;
     private EditText edtSearch;
     private TabLayout tabLayout;
     private RecyclerView rcvOrders;
     private TextView tvEmptyOrders;
 
-
     private MyOrdersAdapter adapter;
-    private List<Order> orderList = new ArrayList<>();
-    private List<Order> filteredList = new ArrayList<>();
+    private final List<Order> orderList = new ArrayList<>();
+    private final List<Order> filteredList = new ArrayList<>();
     private SharedPrefManager sharedPrefManager;
 
-    private String currentStatus = "ALL"; // ALL, PROCESSING, SHIPPING, COMPLETED, CANCELLED
+    private String currentStatus = "ALL"; // ALL, DANG_XU_LY, DANG_GIAO, HOAN_THANH, DA_HUY
+
+    // ===== Loading =====
+    private FrameLayout loadingOverlay;
+    private LinearLayout contentLayout;
+    private TextView txtLoading;
+    private int pendingRequests = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_my_orders);
 
-        // Back press dispatcher (chuẩn mới)
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-
-                finish(); // custom back behavior
+                finish();
             }
         });
 
@@ -68,9 +75,14 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         setupTabLayout();
         setupSearchBar();
         setupListeners();
+
         sharedPrefManager = new SharedPrefManager(this);
+
+        // bật loading khi vào màn
+        showLoading(true, "Đang tải đơn hàng...");
         loadOrdersFromApi(sharedPrefManager.getUserId());
     }
+
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         edtSearch = findViewById(R.id.edtSearch);
@@ -78,6 +90,26 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         rcvOrders = findViewById(R.id.rcvOrders);
         tvEmptyOrders = findViewById(R.id.tvEmptyOrders);
 
+        // loading
+        loadingOverlay = findViewById(R.id.loadingOverlay);
+        contentLayout = findViewById(R.id.contentLayout);
+        txtLoading = findViewById(R.id.txtLoading);
+    }
+
+    private void showLoading(boolean show, String message) {
+        if (txtLoading != null && message != null) txtLoading.setText(message);
+        if (loadingOverlay != null) loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (contentLayout != null) contentLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
+
+    private void startRequest(String message) {
+        pendingRequests++;
+        showLoading(true, message);
+    }
+
+    private void finishRequest() {
+        pendingRequests = Math.max(0, pendingRequests - 1);
+        if (pendingRequests == 0) showLoading(false, null);
     }
 
     private void setupRecyclerView() {
@@ -93,40 +125,24 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
                 switch (position) {
-                    case 0:
-                        currentStatus = "ALL"; break;
-                    case 1:
-                        currentStatus = "DANG_XU_LY"; break;
-                    case 2:
-                        currentStatus = "DANG_GIAO"; break;
-                    case 3:
-                        currentStatus = "HOAN_THANH"; break;
-                    case 4:
-                        currentStatus = "DA_HUY"; break;
+                    case 0: currentStatus = "ALL"; break;
+                    case 1: currentStatus = "DANG_XU_LY"; break;
+                    case 2: currentStatus = "DANG_GIAO"; break;
+                    case 3: currentStatus = "HOAN_THANH"; break;
+                    case 4: currentStatus = "DA_HUY"; break;
                 }
                 filterOrders();
             }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
     private void setupSearchBar() {
         edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterOrders();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { filterOrders(); }
+            @Override public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -135,79 +151,70 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
     }
 
     private void loadOrdersFromApi(long userId) {
+        startRequest("Đang tải đơn hàng...");
+
         ApiClient.get().getOrdersByUserId(userId)
                 .enqueue(new retrofit2.Callback<List<OrderDetailDto>>() {
                     @Override
                     public void onResponse(Call<List<OrderDetailDto>> call,
                                            retrofit2.Response<List<OrderDetailDto>> response) {
+                        try {
+                            Log.d("DEBUG_ORDER", "code=" + response.code());
+                            Log.d("DEBUG_ORDER", "isSuccessful=" + response.isSuccessful());
+                            Log.d("DEBUG_ORDER", "body=" + response.body());
 
-                        Log.d("DEBUG_ORDER", "code=" + response.code());
-                        Log.d("DEBUG_ORDER", "isSuccessful=" + response.isSuccessful());
-                        Log.d("DEBUG_ORDER", "body=" + response.body());
+                            if (response.isSuccessful() && response.body() != null) {
+                                orderList.clear();
 
-                        if (response.isSuccessful() && response.body() != null) {
-                            orderList.clear();
-
-                            List<OrderDetailDto> dtoList = response.body();
-                            Log.d("DEBUG_ORDER", "dtoList size=" + dtoList.size());
-
-                            for (OrderDetailDto dto : dtoList) {
-                                Order order = mapDtoToOrder(dto);
-                                if (order != null) {
-                                    orderList.add(order);
-                                    Log.d("DEBUG_ORDER", "Added order: " + order.getOrderId());
+                                List<OrderDetailDto> dtoList = response.body();
+                                for (OrderDetailDto dto : dtoList) {
+                                    Order order = mapDtoToOrder(dto);
+                                    if (order != null) orderList.add(order);
                                 }
-                            }
 
-                            filterOrders();
-                        } else {
-                            Log.e("DEBUG_ORDER", "Response failed, code=" + response.code());
-                            Toast.makeText(MyOrdersActivity.this,
-                                    "Không lấy được đơn hàng",
-                                    Toast.LENGTH_SHORT).show();
+                                filterOrders();
+                            } else {
+                                Toast.makeText(MyOrdersActivity.this,
+                                        "Không lấy được đơn hàng",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } finally {
+                            finishRequest();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<OrderDetailDto>> call, Throwable t) {
-                        Log.e("DEBUG_ORDER", "API call failed: " + t.getMessage());
-                        t.printStackTrace();
-                        Toast.makeText(MyOrdersActivity.this,
-                                "Lỗi kết nối: " + t.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        try {
+                            Log.e("DEBUG_ORDER", "API call failed: " + t.getMessage());
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Lỗi kết nối: " + t.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        } finally {
+                            finishRequest();
+                        }
                     }
                 });
     }
 
     private void filterOrders() {
         filteredList.clear();
-//        filteredList.addAll(orderList);
-//        adapter.updateData(filteredList);
 
-        Log.d("DEBUG_FILTER", "Showing all orders: " + filteredList.size());
         String searchQuery = edtSearch.getText().toString().toLowerCase().trim();
-
-        Log.d("DEBUG_FILTER", "Filtering with status=" + currentStatus + ", search=" + searchQuery);
-        Log.d("DEBUG_FILTER", "orderList size=" + orderList.size());
 
         for (Order order : orderList) {
             boolean matchStatus = currentStatus.equals("ALL") || order.getStatus().equals(currentStatus);
 
-            boolean matchSearch = searchQuery.isEmpty() ||
-                    order.getOrderId().toLowerCase().contains(searchQuery) ||
-                    (order.getProducts() != null && order.getProducts().size() > 0 &&
-                            order.getProducts().get(0).getName().toLowerCase().contains(searchQuery));
+            boolean matchSearch = searchQuery.isEmpty()
+                    || order.getOrderId().toLowerCase().contains(searchQuery)
+                    || (order.getProducts() != null && !order.getProducts().isEmpty()
+                    && order.getProducts().get(0).getName().toLowerCase().contains(searchQuery));
 
-            Log.d("DEBUG_FILTER", "Order #" + order.getOrderId() +
-                    ", matchStatus=" + matchStatus + ", matchSearch=" + matchSearch);
-
-            if (matchStatus && matchSearch) {
-                filteredList.add(order);
-            }
+            if (matchStatus && matchSearch) filteredList.add(order);
         }
 
-        Log.d("DEBUG_FILTER", "filteredList final size=" + filteredList.size());
         adapter.updateData(filteredList);
+
         if (filteredList.isEmpty()) {
             tvEmptyOrders.setVisibility(View.VISIBLE);
             rcvOrders.setVisibility(View.GONE);
@@ -215,7 +222,6 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
             tvEmptyOrders.setVisibility(View.GONE);
             rcvOrders.setVisibility(View.VISIBLE);
         }
-
     }
 
     @Override
@@ -229,63 +235,71 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         startActivity(intent);
     }
 
+    // ===== "MUA LẠI" (Reorder) có loading =====
     @Override
     public void onReorderClick(Order order) {
+        startRequest("Đang chuẩn bị đơn mua lại...");
+
         ApiClient.get().getUserOrderItems(Long.parseLong(order.getOrderId()))
-            .enqueue(new retrofit2.Callback<List<OrderDetailItemDto>>() {
-                @Override
-                public void onResponse(Call<List<OrderDetailItemDto>> call,
-                                       retrofit2.Response<List<OrderDetailItemDto>> response) {
+                .enqueue(new retrofit2.Callback<List<OrderDetailItemDto>>() {
+                    @Override
+                    public void onResponse(Call<List<OrderDetailItemDto>> call,
+                                           retrofit2.Response<List<OrderDetailItemDto>> response) {
+                        try {
+                            if (response.isSuccessful() && response.body() != null) {
 
-                    if (response.isSuccessful() && response.body() != null) {
+                                ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
+                                for (OrderDetailItemDto dto : response.body()) {
+                                    CheckoutItem item = new CheckoutItem(
+                                            dto.getProductId(),
+                                            dto.getProductName(),
+                                            dto.getImageUrl(),
+                                            dto.getDonGia(),
+                                            dto.getSoLuong()
+                                    );
+                                    checkoutItems.add(item);
+                                }
 
-                        ArrayList<CheckoutItem> checkoutItems = new ArrayList<>();
-
-                        for (OrderDetailItemDto dto : response.body()) {
-                            CheckoutItem item = new CheckoutItem(
-                                    dto.getProductId(),
-                                    dto.getProductName(),
-                                    dto.getImageUrl(),
-                                    dto.getDonGia(),
-                                    dto.getSoLuong()
-                            );
-                            checkoutItems.add(item);
+                                Intent intent = new Intent(MyOrdersActivity.this, CheckoutActivity.class);
+                                intent.putExtra("reorder_items", checkoutItems);
+                                intent.putExtra("isReorder", true);
+                                intent.putExtra("isBuyNow", 1);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(MyOrdersActivity.this,
+                                        "Không thể tải chi tiết để mua lại",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } finally {
+                            finishRequest();
                         }
-
-                        Intent intent = new Intent(MyOrdersActivity.this,
-                                CheckoutActivity.class);
-                        intent.putExtra("reorder_items", checkoutItems);
-                        intent.putExtra("isReorder", true);
-                        intent.putExtra("isBuyNow", 1);
-                        startActivity(intent);
                     }
-                }
 
-                @Override
-                public void onFailure(Call<List<OrderDetailItemDto>> call, Throwable t) {
-                    Toast.makeText(MyOrdersActivity.this,
-                            "Không thể mua lại đơn hàng",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<List<OrderDetailItemDto>> call, Throwable t) {
+                        try {
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Không thể mua lại đơn hàng",
+                                    Toast.LENGTH_SHORT).show();
+                        } finally {
+                            finishRequest();
+                        }
+                    }
+                });
     }
+
     private Order mapDtoToOrder(OrderDetailDto dto) {
-        if (dto == null) {
-            Log.e("DEBUG_ORDER", "DTO is null");
-            return null;
-        }
+        if (dto == null) return null;
 
         Order order = new Order();
         order.setOrderId(String.valueOf(dto.getId()));
         order.setStatus(dto.getTrangThai());
 
-        // Parse ngày đặt hàng
         if (dto.getNgayDatHang() != null) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 order.setCreatedAt(sdf.parse(dto.getNgayDatHang()).getTime());
             } catch (Exception e) {
-                Log.e("DEBUG_ORDER", "Error parsing date: " + e.getMessage());
                 order.setCreatedAt(System.currentTimeMillis());
             }
         } else {
@@ -295,11 +309,8 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
         order.setPaymentMethod(dto.getPhuongThucThanhToan());
         order.setTotalPrice(dto.getTongTien());
 
-        // Map products
         List<OrderProduct> products = new ArrayList<>();
         if (dto.getItems() != null && !dto.getItems().isEmpty()) {
-            Log.d("DEBUG_ORDER", "Mapping " + dto.getItems().size() + " items");
-
             for (OrderDetailItemDto itemDto : dto.getItems()) {
                 OrderProduct product = new OrderProduct();
                 product.setId(itemDto.getProductId());
@@ -307,54 +318,60 @@ public class MyOrdersActivity extends AppCompatActivity implements MyOrdersAdapt
                 product.setImage(itemDto.getImageUrl());
                 product.setPrice(itemDto.getDonGia() != null ? itemDto.getDonGia() : 0);
                 product.setQuantity(itemDto.getSoLuong());
-
-                Log.d("DEBUG_ORDER", "Product: " + product.getName() + ", price=" + product.getPrice());
                 products.add(product);
             }
-        } else {
-            Log.w("DEBUG_ORDER", "No items in DTO");
         }
 
         order.setProducts(products);
         order.calculateTotal();
-
         return order;
     }
+
     @Override
     public void onCancelOrderClick(Order order) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Xác nhận huỷ đơn")
                 .setMessage("Bạn có chắc chắn muốn huỷ đơn hàng này không?")
-                .setPositiveButton("Huỷ đơn", (dialog, which) -> {
-                    callCancelOrderApi(order);
-                })
+                .setPositiveButton("Huỷ đơn", (dialog, which) -> callCancelOrderApi(order))
                 .setNegativeButton("Không", null)
                 .show();
     }
+
+    // ===== HUỶ ĐƠN có loading =====
     private void callCancelOrderApi(Order order) {
+        startRequest("Đang huỷ đơn...");
+
         ApiClient.get().cancelOrder(Long.parseLong(order.getOrderId()))
                 .enqueue(new retrofit2.Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(MyOrdersActivity.this,
-                                    "Huỷ đơn thành công",
-                                    Toast.LENGTH_SHORT).show();
+                        try {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(MyOrdersActivity.this,
+                                        "Huỷ đơn thành công",
+                                        Toast.LENGTH_SHORT).show();
 
-                            order.setStatus("DA_HUY");
-                            filterOrders();
-                        } else {
-                            Toast.makeText(MyOrdersActivity.this,
-                                    "Không thể huỷ đơn",
-                                    Toast.LENGTH_SHORT).show();
+                                order.setStatus("DA_HUY");
+                                filterOrders();
+                            } else {
+                                Toast.makeText(MyOrdersActivity.this,
+                                        "Không thể huỷ đơn",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        } finally {
+                            finishRequest();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(MyOrdersActivity.this,
-                                "Lỗi: " + t.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        try {
+                            Toast.makeText(MyOrdersActivity.this,
+                                    "Lỗi: " + t.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        } finally {
+                            finishRequest();
+                        }
                     }
                 });
     }

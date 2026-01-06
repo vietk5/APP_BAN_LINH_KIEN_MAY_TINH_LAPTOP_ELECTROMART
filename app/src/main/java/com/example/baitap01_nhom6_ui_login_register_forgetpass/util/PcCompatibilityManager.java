@@ -27,7 +27,7 @@ public class PcCompatibilityManager {
         slots.add(new PcPartSlot("RAM", "Bộ nhớ trong (RAM)", android.R.drawable.ic_menu_info_details, true));
         slots.add(new PcPartSlot("VGA", "Card màn hình (VGA)", android.R.drawable.ic_menu_info_details, false));
         slots.add(new PcPartSlot("SSD", "Ổ cứng (SSD/HDD)", android.R.drawable.ic_menu_info_details, true));
-        slots.add(new PcPartSlot("PSU", "Nguồn máy tính (PSU)", android.R.drawable.ic_menu_info_details, true));
+        slots.add(new PcPartSlot("Nguồn", "Nguồn máy tính (PSU)", android.R.drawable.ic_menu_info_details, true));
         slots.add(new PcPartSlot("CASE", "Vỏ máy tính (Case)", android.R.drawable.ic_menu_info_details, true));
     }
 

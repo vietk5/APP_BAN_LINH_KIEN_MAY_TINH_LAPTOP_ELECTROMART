@@ -256,6 +256,7 @@ public class PcBuilderFragment extends Fragment implements PcBuilderAdapter.OnSl
 
     @Override
     public void onSelectClick(int position, PcPartSlot slot) {
+
         currentSelectingKey = slot.getKey();
 
         Intent intent = new Intent(getContext(), SearchActivity.class);
