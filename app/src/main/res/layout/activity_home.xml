@@ -37,6 +37,7 @@
                 android:background="#F9FAFB"
                 android:gravity="center_vertical">
 
+                <!-- Search icon -->
                 <ImageView
                     android:id="@+id/btnSearch"
                     android:layout_width="30dp"
@@ -44,26 +45,57 @@
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_search"
                     app:tint="#0F50D3"
-                    android:contentDescription="@string/app_name" />
+                    android:contentDescription="Search" />
 
-                <EditText
-                    android:id="@+id/edtSearch"
+                <!-- Search container with EditText + Camera button inside -->
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="38dp"
                     android:layout_weight="1"
-                    android:background="@drawable/edit_text_bg"
-                    android:hint="Nhập link hoặc tên sản phẩm"
-                    android:paddingHorizontal="10dp"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:background="@drawable/edit_text_bg">
 
+                    <!-- EditText -->
+                    <EditText
+                        android:id="@+id/edtSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="Nhập link hoặc tên sản phẩm"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="42dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:textSize="14sp"
+                        android:singleLine="true"
+                        android:imeOptions="actionSearch" />
+
+                    <!-- Camera button inside EditText -->
+                    <ImageButton
+                        android:id="@+id/btn_image_search"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="2dp"
+                        android:src="@drawable/ic_camera"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="6dp"
+                        android:scaleType="centerInside"
+                        app:tint="#3B82F6"
+                        android:contentDescription="Tìm kiếm bằng hình ảnh" />
+                </RelativeLayout>
+
+                <!-- Cart icon -->
                 <ImageView
                     android:id="@+id/btnCartHeader"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="12dp"
                     android:src="@drawable/ic_cart"
-                    app:tint="#3B82F6" />
+                    app:tint="#3B82F6"
+                    android:contentDescription="Cart" />
             </LinearLayout>
+
 
             <!-- 📍 Chào mừng người dùng (nhỏ gọn hơn) -->
             <TextView

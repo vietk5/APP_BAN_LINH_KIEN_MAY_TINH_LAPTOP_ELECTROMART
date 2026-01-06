@@ -1,6 +1,7 @@
 package com.example.baitap01_nhom6_ui_login_register_forgetpass.remote;
 
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Comment;
+import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.Product;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ApiResponse;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.BrandDto;
 import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.dto.ChangePasswordRequest;
@@ -38,6 +39,7 @@ import com.example.baitap01_nhom6_ui_login_register_forgetpass.models.voucher.Vo
 
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -119,6 +121,48 @@ public interface ApiService {
             @Query("groupBy") String groupBy  // "DAY" / "MONTH" / "YEAR"
     );
 
+    // ====== ADMIN VOUCHERS ======
+    @GET("/api/admin/vouchers")
+    Call<List<VoucherDto>> adminListVouchers();
+
+    @POST("/api/admin/vouchers")
+    Call<VoucherDto> adminCreateVoucher(
+            @Body CreateVoucherRequest req
+    );
+
+    @PUT("/api/admin/vouchers/{id}")
+    Call<VoucherDto> adminUpdateVoucher(
+            @Path("id") long id,
+            @Body CreateVoucherRequest req
+    );
+
+    @PATCH("/api/admin/vouchers/{id}/toggle")
+    Call<VoucherDto> adminToggleVoucher(
+            @Path("id") long id,
+            @Query("hoatDong") boolean hoatDong
+    );
+
+    @DELETE("/api/admin/vouchers/{id}")
+    Call<Void> adminDeleteVoucher(@Path("id") long id);
+
+
+    // ====== USER APPLY ======
+    @POST("/api/vouchers/apply")
+    Call<ApplyVoucherResponse> applyVoucher(
+            @Body ApplyVoucherRequest req
+    );
+
+    @GET("/api/spin/status")
+    Call<SpinStatusResponse> getSpinStatus(@Query("userId") long userId);
+
+    @POST("/api/spin")
+    Call<SpinResultResponse> spin(@Body SpinRequest req);
+
+    @PATCH("api/user/orders/{orderId}/cancel")
+    Call<Void> cancelOrder(@Path("orderId") long orderId);
+
+    @GET("/api/user/orders/{id}/items")
+    Call<List<OrderDetailItemDto>> getUserOrderItems(@Path("id") long orderId);
     // ======== FORGOT PASSWORD ===========
     @POST("api/auth/forgot-password")
     Call<ApiResponse<Void>> forgotPassword(@Body ForgotPasswordRequest request);
@@ -178,11 +222,6 @@ public interface ApiService {
 
     @POST("api/comments")
     Call<Comment> postComment(@Body Comment comment);
-
-    @Multipart
-    @POST("api/comments/upload")
-    Call<UploadImageResponse> uploadCommentImage(@Part MultipartBody.Part image);
-
     @GET("api/products/{id}")
     Call<ProductDto> getProductById(@Path("id") long id);
     // lâys dữ liệu tỷ lệ rate
@@ -263,50 +302,38 @@ public interface ApiService {
             @Path("id") Long id,
             @Query("userId") Long userId
     );
+// ==================== IMAGE SEARCH ENDPOINTS ====================
+    /**
+     * Tìm kiếm sản phẩm bằng ảnh base64
+     * Endpoint: POST /api/search/by-image
+     * Body: {"imageBase64": "base64_string"}
+     */
+    @POST("api/search/by-image")
+    Call<ApiResponse<List<Product>>> searchByImage(@Body Map<String, String> request);
 
-    // ====== ADMIN VOUCHERS ======
-    @GET("/api/admin/vouchers")
-    Call<List<VoucherDto>> adminListVouchers();
+    /**
+     * Tìm kiếm sản phẩm bằng upload file
+     * Endpoint: POST /api/search/upload
+     * Form-data: file=image_file
+     */
+    @Multipart
+    @POST("api/search/upload")
+    Call<ApiResponse<List<Product>>> searchByUpload(@Part MultipartBody.Part file);
 
-    @POST("/api/admin/vouchers")
-    Call<VoucherDto> adminCreateVoucher(
-            @Body CreateVoucherRequest req
-    );
-
-    @PUT("/api/admin/vouchers/{id}")
-    Call<VoucherDto> adminUpdateVoucher(
-            @Path("id") long id,
-            @Body CreateVoucherRequest req
-    );
-
-    @PATCH("/api/admin/vouchers/{id}/toggle")
-    Call<VoucherDto> adminToggleVoucher(
-            @Path("id") long id,
-            @Query("hoatDong") boolean hoatDong
-    );
-
-    @DELETE("/api/admin/vouchers/{id}")
-    Call<Void> adminDeleteVoucher(@Path("id") long id);
-
-
-    // ====== USER APPLY ======
-    @POST("/api/vouchers/apply")
-    Call<ApplyVoucherResponse> applyVoucher(
-            @Body ApplyVoucherRequest req
-    );
-
-    @GET("/api/spin/status")
-    Call<SpinStatusResponse> getSpinStatus(@Query("userId") long userId);
-
-    @POST("/api/spin")
-    Call<SpinResultResponse> spin(@Body SpinRequest req);
-
-    @PATCH("api/user/orders/{orderId}/cancel")
-    Call<Void> cancelOrder(@Path("orderId") long orderId);
-
-    @GET("/api/user/orders/{id}/items")
-    Call<List<OrderDetailItemDto>> getUserOrderItems(@Path("id") long orderId);
-
+    /**
+     * Tìm kiếm với nhiều ảnh
+     * Endpoint: POST /api/search/by-multiple-images
+     * Body: {"imageBase64List": ["base64_1", "base64_2"]}
+     */
+    @POST("api/search/by-multiple-images")
+    Call<ApiResponse<List<Product>>> searchByMultipleImages(@Body Map<String, List<String>> request);
+    @GET("api/search/health")
+    Call<ApiResponse<String>> searchHealthCheck();
+    @GET("api/search/stats")
+    Call<ApiResponse<Map<String, Object>>> searchStats();
     @GET("/api/user/orders/{orderId}")
     Call<OrderDetailDto> getOrderDetail(@Path("orderId") long orderId);
+    @Multipart
+    @POST("api/comments/upload")
+    Call<UploadImageResponse> uploadCommentImage(@Part MultipartBody.Part image);
 }
