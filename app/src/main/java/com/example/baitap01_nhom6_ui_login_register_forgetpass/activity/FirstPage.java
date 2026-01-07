@@ -33,7 +33,7 @@ public class FirstPage extends AppCompatActivity {
         });
 
         new Handler().postDelayed(() -> {
-            Intent intent = new Intent(FirstPage.this, LoginActivity.class);
+            Intent intent = new Intent(FirstPage.this, MainActivity.class);
             startActivity(intent);
             finish();
         }, 3000);
