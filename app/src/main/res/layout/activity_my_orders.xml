@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rootFrame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-    <!-- CONTENT CŨ -->
     <LinearLayout
-        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#F5F5F5">
+        android:orientation="vertical">
 
-        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,7 +17,6 @@
             android:background="#1976D2"
             android:paddingBottom="16dp">
 
-            <!-- Toolbar -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -50,7 +44,6 @@
 
             </RelativeLayout>
 
-            <!-- Search Bar -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +85,6 @@
 
         </LinearLayout>
 
-        <!-- Tab Layout -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -153,40 +145,12 @@
 
     </LinearLayout>
 
-    <!-- LOADING OVERLAY -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#80000000"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ProgressBar
-                android:id="@+id/progressLoading"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/txtLoading"
-                android:layout_marginTop="10dp"
-                android:text="Đang tải đơn hàng..."
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-    </FrameLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:indeterminateTint="#1976D2"/>
 
 </FrameLayout>

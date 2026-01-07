@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,15 +42,7 @@ public class ProfileFragment extends Fragment {
 
     private TextView tvUserName, tvUserEmail;
     private LinearLayout menuProfile, menuOrders, menuAddress, menuChangePassword, btnLogout;
-
-    // Loading overlay
-    private FrameLayout loadingOverlay;
-    private ProgressBar progressLoading;
-    private TextView txtLoading;
-
-    // Prevent double loading
-    private Call<ApiResponse<UserDto>> profileCall;
-    private boolean isFetchingProfile = false;
+    private ProgressBar progressBar; // Thêm ProgressBar
 
     private final ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -62,9 +53,7 @@ public class ProfileFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -78,10 +67,11 @@ public class ProfileFragment extends Fragment {
         initViews(view);
         setupClickListeners();
 
+        // Giống ProfileActivity cũ: vào Profile là yêu cầu login
         if (!sharedPref.isLoggedIn()) {
-            showLoading(false, null);
-            loadUserInfoFromSharedPrefGuest();
             showLoginDialog();
+            // vẫn hiển thị trạng thái khách (để UI không trống)
+            loadUserInfoFromSharedPrefGuest();
             return;
         }
 
@@ -91,94 +81,74 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Giống Activity cũ: quay lại là reload
         if (sharedPref != null && sharedPref.isLoggedIn()) {
-            loadUserInfoFromApi(); // không chồng do isFetchingProfile + cancel
+            loadUserInfoFromApi();
         }
     }
 
     private void initViews(View view) {
         tvUserName = view.findViewById(R.id.tv_user_name);
         tvUserEmail = view.findViewById(R.id.tv_user_email);
+        progressBar = view.findViewById(R.id.progress_bar); // Ánh xạ ProgressBar
 
+        // menu_profile có trong layout của bạn (ảnh trước có), nên mình map lại luôn
         menuProfile = view.findViewById(R.id.menu_profile);
         menuOrders = view.findViewById(R.id.menu_orders);
         menuAddress = view.findViewById(R.id.menu_address);
         menuChangePassword = view.findViewById(R.id.menu_change_password);
         btnLogout = view.findViewById(R.id.btn_logout);
-
-        loadingOverlay = view.findViewById(R.id.loadingOverlay);
-        progressLoading = view.findViewById(R.id.progressLoading);
-        txtLoading = view.findViewById(R.id.txtLoading);
-
-        showLoading(false, null);
     }
 
-    private void showLoading(boolean show, String message) {
-        if (!isAdded()) return;
-        if (txtLoading != null && message != null) txtLoading.setText(message);
-        if (loadingOverlay != null) loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
+    /**
+     * Load thông tin user từ API để đảm bảo dữ liệu mới nhất
+     */
     private void loadUserInfoFromApi() {
-        if (sharedPref == null || !sharedPref.isLoggedIn()) return;
-
-        long userId = sharedPref.getUserId();
-        if (userId <= 0) {
+        Long userId = (long) sharedPref.getUserId();
+        if (userId == null || userId == -1) {
             loadUserInfoFromSharedPref();
             return;
         }
 
-        // chặn gọi chồng
-        if (isFetchingProfile) return;
-        isFetchingProfile = true;
+        // Hiển thị ProgressBar khi bắt đầu gọi API
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
-        // cancel call cũ
-        if (profileCall != null && !profileCall.isCanceled()) {
-            profileCall.cancel();
-        }
-
-        showLoading(true, "Đang tải thông tin...");
-
-        profileCall = apiService.getProfile(userId);
-        profileCall.enqueue(new Callback<ApiResponse<UserDto>>() {
+        apiService.getProfile(userId).enqueue(new Callback<ApiResponse<UserDto>>() {
             @Override
             public void onResponse(Call<ApiResponse<UserDto>> call, Response<ApiResponse<UserDto>> response) {
-                try {
-                    if (!isAdded()) return;
+                if (!isAdded()) return;
 
-                    if (response.isSuccessful() && response.body() != null) {
-                        ApiResponse<UserDto> apiResponse = response.body();
-                        if (apiResponse.isSuccess() && apiResponse.getData() != null) {
-                            UserDto user = apiResponse.getData();
-                            displayUserInfo(user);
+                // Ẩn ProgressBar khi có phản hồi
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
 
-                            sharedPref.saveUser(
-                                    user.getId(),
-                                    user.getEmail(),
-                                    user.getHoTen() != null ? user.getHoTen() : ""
-                            );
-                        } else {
-                            loadUserInfoFromSharedPref();
-                        }
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<UserDto> apiResponse = response.body();
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        UserDto user = apiResponse.getData();
+                        displayUserInfo(user);
+
+                        // Update SharedPref bằng data mới nhất
+                        sharedPref.saveUser(
+                                user.getId(),
+                                user.getEmail(),
+                                user.getHoTen() != null ? user.getHoTen() : ""
+                        );
                     } else {
                         loadUserInfoFromSharedPref();
                     }
-                } finally {
-                    isFetchingProfile = false;
-                    showLoading(false, null);
+                } else {
+                    loadUserInfoFromSharedPref();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<UserDto>> call, Throwable t) {
-                try {
-                    if (!isAdded()) return;
-                    if (call.isCanceled()) return;
-                    loadUserInfoFromSharedPref();
-                } finally {
-                    isFetchingProfile = false;
-                    showLoading(false, null);
-                }
+                if (!isAdded()) return;
+
+                // Ẩn ProgressBar khi lỗi
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+
+                loadUserInfoFromSharedPref();
             }
         });
     }
@@ -202,27 +172,39 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupClickListeners() {
+
         if (menuOrders != null) {
             menuOrders.setOnClickListener(v -> {
-                if (checkLogin()) startActivity(new Intent(requireContext(), MyOrdersActivity.class));
+                if (checkLogin()) {
+                    startActivity(new Intent(requireContext(), MyOrdersActivity.class));
+                }
             });
         }
 
         if (menuProfile != null) {
             menuProfile.setOnClickListener(v -> {
-                if (checkLogin()) launcher.launch(new Intent(requireContext(), UpdateProfileActivity.class));
+                if (checkLogin()) {
+                    Intent intent = new Intent(requireContext(), UpdateProfileActivity.class);
+                    launcher.launch(intent);
+                }
             });
         }
 
         if (menuAddress != null) {
             menuAddress.setOnClickListener(v -> {
-                if (checkLogin()) launcher.launch(new Intent(requireContext(), AddressListActivity.class));
+                if (checkLogin()) {
+                    Intent intent = new Intent(requireContext(), AddressListActivity.class);
+                    launcher.launch(intent);
+                }
             });
         }
 
         if (menuChangePassword != null) {
             menuChangePassword.setOnClickListener(v -> {
-                if (checkLogin()) launcher.launch(new Intent(requireContext(), ChangePasswordActivity.class));
+                if (checkLogin()) {
+                    Intent intent = new Intent(requireContext(), ChangePasswordActivity.class);
+                    launcher.launch(intent);
+                }
             });
         }
 
@@ -240,7 +222,9 @@ public class ProfileFragment extends Fragment {
 
                             Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
 
-                            if (getActivity() != null) getActivity().finishAffinity();
+                            if (getActivity() != null) {
+                                getActivity().finishAffinity();
+                            }
                         })
                         .setNegativeButton("Hủy", null)
                         .show();
@@ -264,20 +248,15 @@ public class ProfileFragment extends Fragment {
         builder.setTitle("Yêu cầu đăng nhập");
         builder.setMessage("Bạn cần đăng nhập để xem trang cá nhân.");
 
-        builder.setPositiveButton("Đăng nhập", (dialog, which) ->
-                startActivity(new Intent(requireContext(), LoginActivity.class)));
+        builder.setPositiveButton("Đăng nhập", (dialog, which) -> {
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+        });
 
-        builder.setNegativeButton("Đăng ký", (dialog, which) ->
-                startActivity(new Intent(requireContext(), RegisterActivity.class)));
+        builder.setNegativeButton("Đăng ký", (dialog, which) -> {
+            startActivity(new Intent(requireContext(), RegisterActivity.class));
+        });
 
         builder.setCancelable(false);
         builder.show();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (profileCall != null) profileCall.cancel();
-        showLoading(false, null);
     }
 }

@@ -19,6 +19,11 @@ public class EmptyCartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+            v.setPadding(0, statusBars.top, 0, 0);
+            return insets;
+        });
         setContentView(R.layout.activity_empty_cart);
 
         btnShopNow = findViewById(R.id.btn_shop_now);
